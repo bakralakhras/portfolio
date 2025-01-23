@@ -17,6 +17,7 @@ jobs:
         run: |
           npm ci --legacy-peer-deps
           npm run build
+          npm run build -- --max-warnings=0
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
