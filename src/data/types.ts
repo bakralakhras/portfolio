@@ -25,3 +25,11 @@ export interface ExperienceData {
     description: string
     logoSrc?: string | null
 }
+export interface CertificateData {
+    title: string
+    company: string
+    location: string
+    dates: string
+    description: React.ReactNode
+    logoSrc?: string | null
+}

@@ -24,19 +24,19 @@ const Contact: FC = () => {
                     <Card maxW={'85vw'} w={'xl'} pb={8} overflow={'hidden'}>
                         <Flex textAlign={'center'}>
                             <Container w='50%'>
-                                <Link href='mailto:jason@jasonfyw.com'>
+                                <Link href='mailto:bakrfalakhras@gmail.com'>
                                     <Badge colorScheme='green'>Personal</Badge>
                                     <Text textDecoration={'underline'}>
-                                        jason@jasonfyw.com
+                                    bakrfalakhras@gmail.com
                                     </Text>
                                 </Link>
                             </Container>
                             <Spacer />
                             <Container w='50%'>
-                                <Link href='mailto:jsn.wang@mail.utoronto.ca'>
+                                <Link href='mailto:baker.alakhras@bahcesehir.edu.tr'>
                                     <Badge colorScheme='orange'>Academic</Badge>
                                     <Text textDecoration={'underline'}>
-                                        jsn.wang@mail.utoronto.ca
+                                    baker.alakhras@bahcesehir.edu.tr
                                     </Text>
                                 </Link>
                             </Container>

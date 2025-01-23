@@ -30,6 +30,8 @@ const Projects: FC = () => {
                 px={[0, 10]}
             >
                 <VStack spacing={0}>
+               
+                    
                     <Fade>
                         <Heading as='h2'>Featured Projects</Heading>
                     </Fade>

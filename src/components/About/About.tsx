@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { Element } from 'react-scroll'
 import Fade from 'react-reveal/Fade'
-import headshot from '../../media/headshot.jpg'
+import headshot from '../../media/bakr_pfp-modified.png'
 
 const About: FC = () => {
     return (
@@ -40,9 +40,9 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>👋🏼</Center>
                                     <Text>
-                                        Hi, I'm Jason and I'm a third year co-op
-                                        student at the{' '}
-                                        <b>University of Toronto</b> with a
+                                        Hi, I'm Bakr and I'm a fourth year
+                                        student at{' '}
+                                        <b>Bahcesehir University</b> with a
                                         passion for <b>Software Engineering</b>
                                     </Text>
                                 </Flex>
@@ -51,13 +51,12 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>🎓</Center>
                                     <Text>
-                                        I'm pursuing an HBSc with a{' '}
+                                        I'm pursuing a Bachelor Degree in {' '}
                                         <b>
-                                            Specialist in Computer Science (ASIP
-                                            co-op)
+                                            Software Engineering
                                         </b>{' '}
-                                        and <b>Major in Cognitive Science</b>,
-                                        graduating class of 2026.
+                                        and <b>I'm a High-Honor Student</b>,
+                                        graduating class of 2025.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -65,12 +64,12 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>👨🏻‍💻</Center>
                                     <Text>
-                                        I am currently a <b>Software Developer at theScore</b> and I have previously held a position as a{' '}
+                                        I am currently an <b>Aspiring Software and Cloud Engineer</b> and I have previously held a position as a{' '}
                                         <b>
-                                            Software Engineering Intern at
-                                            NerveX
+                                            Cloud Engineering Intern at
+                                            PwC
                                         </b>{' '}
-                                        working in full-stack development. I also have experience as a developer at various student organizations, including <b>UofT Blueprint, UTMIST,</b> and <b>UofT AI</b>.
+                                        working in Cloud development.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -78,13 +77,12 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>🚀</Center>
                                     <Text>
-                                        I'm experienced in full-stack web
-                                        development - particularly with{' '}
-                                        <b>Typescript</b> and <b>Python</b>.{' '}
-                                        <b>ReactJS</b> is my frontend framework
+                                        I'm experienced in DevOps - particularly with{' '}
+                                        <b>Azure, Aws</b> and <b>Python</b>.{' '}
+                                        <b>Terraform</b> is my Infrastructure as Code
                                         of choice and I've worked in backend
                                         with{' '}
-                                        <b>NodeJS, .NET Core, Java,</b> and <b>Python</b>.
+                                        <b>Java,</b> and <b>Python</b>.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -94,25 +92,8 @@ const About: FC = () => {
                                     <Text>
                                         In addition to Software Engineering, I
                                         am also interested in the confluence of
-                                        artificial intelligence and cognitive
-                                        science, as well as photography! Check
-                                        out my&nbsp;
-                                        <Link
-                                            href='https://photo.jasonfyw.com'
-                                            isExternal
-                                            fontWeight={'semibold'}
-                                            borderBottom={
-                                                '2px solid rgb(154, 228, 217)'
-                                            }
-                                            transition={'0.2s'}
-                                            _hover={{
-                                                textDecor: 'none',
-                                                opacity: 0.9,
-                                            }}
-                                        >
-                                            photography portfolio to learn more
-                                            about my creative work.
-                                        </Link>
+                                        artificial intelligence!, Espically LLMS and leverging AI to be more optimal.
+                        
                                     </Text>
                                 </Flex>
                             </Fade>

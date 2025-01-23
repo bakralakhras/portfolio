@@ -3,11 +3,45 @@ import { Badge } from '@chakra-ui/react'
 export const ReactBadge = () => {
     return <Badge colorScheme={'teal'}>ReactJS</Badge>
 }
+export const DartBadge = () => {
+    return <Badge colorScheme={'teal'}>Dart</Badge>
+}
+export const FlutterBadge = () => {
+    return <Badge colorScheme={'blue'}>Flutter</Badge>
+}
+export const DynamoDBBadge = () => {
+    return <Badge colorScheme={'orange'}>DynamoDB</Badge>
+}
 
 export const PythonBadge = () => {
     return <Badge colorScheme={'blue'}>Python</Badge>
 }
+export const JupyterBadge = () => {
+    return <Badge colorScheme={'blue'}>Jupyter</Badge>
+}
+export const AiBadge = () => {
+    return <Badge colorScheme={'green'}>AI</Badge>
+}
 
+export const TerraformBadge = () => {
+    return <Badge colorScheme={'purple'}>Terraform</Badge>
+}
+export const KubernetesBadge = () => {
+    return <Badge colorScheme={'blue'}>Kubernetes</Badge>
+}
+export const DockerBadge = () => {
+    return <Badge colorScheme={'teal'}>Docker</Badge>
+}
+export const AWSBadge = () => {
+    return <Badge colorScheme={'orange'}>AWS</Badge>
+}
+export const IacBadge = () => {
+    return <Badge colorScheme={'red'}>IaC</Badge>
+}
+
+export const AzureBadge = () => {
+    return <Badge colorScheme={'blue'}>Azure</Badge>
+}
 export const PHPBadge = () => {
     return <Badge colorScheme={'purple'}>PHP</Badge>
 }

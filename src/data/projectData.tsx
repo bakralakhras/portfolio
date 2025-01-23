@@ -10,203 +10,182 @@ import {
     AssemblyBadge,
     DjangoBadge,
     TypescriptBadge,
+    AWSBadge,
+    TerraformBadge,
+    DynamoDBBadge,
+    AzureBadge,
+    DockerBadge,
+    IacBadge,
+    JupyterBadge,
+    AiBadge,
+    DartBadge,
+    FlutterBadge,
 } from '../components/Projects/TechBadges'
 import { FiGithub, FiLink } from 'react-icons/fi'
 import { ProjectT } from './types'
 
 export const projectData: ProjectT[] = [
     {
-        name: 'PetPal',
-        id: 'petpal',
-        type: 'Web app',
-        tagline: 'A pet adoption platform for animal shelters',
-        tags: [<ReactBadge />, <DjangoBadge />, <MySQLBadge />],
-        imageSrc: '/petpal.png',
+        name: 'Cloud Resume',
+        id: 'cloudresume',
+        type: 'AWS app',
+        tagline: 'A cloud-powered resume built with AWS services.',
+        tags: [<AWSBadge />, <TerraformBadge /> ,<ReactBadge/>,<DynamoDBBadge/>],
+        imageSrc: '/cloud_resume.png',
         description:
-            'A pet adoption platform for animal shelters and prospective adopters featuring an admin dashboard, a customized application process, a REST API, and a frontend built with Tailwind.',
+            'A serverless resume website hosted on AWS, featuring a visitor counter powered by AWS Lambda, API Gateway, and DynamoDB. The project is deployed with S3 and CloudFront for global distribution, with automated CI/CD workflows using GitHub Actions.',
         links: [
             {
-                link: 'https://github.com/leowrites/PetPal',
+                link: 'https://github.com/bakralakhras/Aws_Cloud_Resume',
                 icon: <FiGithub />,
             },
         ],
-        headerLink: 'https://github.com/leowrites/PetPal',
+        headerLink: 'https://github.com/bakralakhras/Aws_Cloud_Resume',
+
+
     },
     {
-        name: 'Street Savvy',
-        id: 'street-savvy',
+        name: 'Azure CI/CD App',
+        id: 'Azure app',
         type: 'Web app',
-        tagline: 'Suggests places to visit tailored using your preferences',
+        tagline: 'A CI/CD pipeline for deploying containerized web apps on Azure.',
         tags: [
+            <AzureBadge/>,
+            <DockerBadge />,
             <ReactBadge />,
-            <TypescriptBadge />,
-            <FirebaseBadge />,
             <PythonBadge />,
         ],
-        imageSrc: '/street-savvy.jpg',
+        imageSrc: '/azure_webapp.png',
         description:
-            'A web app that suggests places to visit in Toronto based on your preferences using a custom recommendation engine and data from the Google Places API. Submitted to UofTHacks X.',
+            'An automated CI/CD pipeline leveraging GitHub Actions to deploy a containerized Flask web application to Azure App Service. The project utilizes Docker for containerization, Azure Container Registry for storage, and monitors performance with Prometheus and Grafana.',
         links: [
             {
-                link: 'https://github.com/jasonfyw/street-savvy',
+                link: 'https://github.com/bakralakhras/Azure-Docker-CI-CD-WebApp',
                 icon: <FiGithub />,
             },
         ],
-        headerLink: 'https://github.com/jasonfyw/street-savvy',
+        headerLink: 'https://github.com/bakralakhras/Azure-Docker-CI-CD-WebApp',
     },
     {
-        name: 'Twitter Geo-Sentiment',
-        id: 'twitter-geo-sentiment',
-        type: 'Web app',
-        tagline: 'Analyse and visualise regional sentiment on Twitter',
-        tags: [<PythonBadge />, <ReactBadge />, <MongoBadge />],
-        imageSrc: '/twitter-geo-sentiment.jpg',
+        name: 'Terraform Scalable Solution',
+        id: 'terraform-solution',
+        type: 'IaC',
+        tagline: 'A scalable cloud infrastructure deployment using Terraform.',
+        tags: [<TerraformBadge />, <AWSBadge />, <AzureBadge /> ,<IacBadge/>],
+        imageSrc: '/terraform_solution.jpg',
         description:
-            'A web tool allowing queries analysing and visualising regional sentiment towards given topics on Twitter during a specific time frame. A custom-trained Naive Bayes model is used to perform sentiment analysis on aggregated data.',
+            "An infrastructure-as-code solution utilizing Terraform to provision and manage scalable cloud resources on Azure. The project ensures high availability, automated deployments, and security best practices, with modular configurations for efficient resource management.",
         links: [
             {
-                link: 'https://github.com/jasonfyw/twitter-geo-sentiment',
+                link: 'https://github.com/bakralakhras/Terraform-Scalable-solution/tree/main',
                 icon: <FiGithub />,
             },
         ],
-        headerLink: 'https://github.com/jasonfyw/twitter-geo-sentiment',
+        headerLink: 'https://github.com/bakralakhras/Terraform-Scalable-solution/tree/main',
     },
+
     {
-        name: 'Fourier Series Animation',
-        id: 'fourier-series',
+        name: 'Monitor App',
+        id: 'flask-monitor',
         type: 'Web app',
         tagline:
-            'Demonstrating the Fourier series by approximating user-inputted line drawings',
+            'A real-time system monitoring web application.',
         tags: [<ReactBadge />, <TypescriptBadge />],
-        imageSrc: '/fourier-series.png',
+        imageSrc: '/monitor_app.jpg',
         description:
-            'An interactive React web app that demonstrates how an arbitrary user-inputted line drawing can be approximated using the Fourier series. Animations are rendered by the P5 library using efficiently implemented computations.',
+            'A Flask-based monitoring application that tracks system metrics such as CPU and memory usage in real-time. The project features interactive visualizations using Plotly and automated alerts for performance thresholds, ensuring proactive system management.',
         links: [
             {
-                link: 'https://github.com/jasonfyw/fourier-series',
+                link: 'https://github.com/bakralakhras/Monitoring-App',
                 icon: <FiGithub />,
             },
             {
-                link: 'https://jasonfyw.com/fourier-series/',
+                link: 'https://github.com/bakralakhras/Monitoring-App',
                 icon: <FiLink />,
             },
         ],
-        headerLink: 'https://jasonfyw.com/fourier-series/',
+        headerLink: 'https://github.com/bakralakhras/Monitoring-App',
     },
     {
-        name: 'Orbital Simulation',
-        id: 'orbital-sim',
-        type: 'Physics simulation',
+        name: 'BitCoin Prediction',
+        id: 'bitcoin',
+        type: 'AI',
         tagline:
-            'A PyGame simulation accurately modelling planetary orbits in space',
-        tags: [<PythonBadge />],
-        imageSrc: '/orbital-sim.png',
+            'An AI-powered Bitcoin price prediction model.',
+        tags: [<PythonBadge />, <JupyterBadge/> , <AiBadge/>],
+        imageSrc: '/bitcoin_prediction.jpg',
         description:
-            'An implementation of Newtonian physics in PyGame using positional data from the JPL Horizons database to simulate and record data on the past and future movements of celestial bodies in our solar system and beyond.',
+            'A machine learning model utilizing Python and libraries such as TensorFlow and Scikit-learn to analyze historical Bitcoin data and predict future prices. The project includes data preprocessing, feature engineering, and performance evaluation to enhance forecasting accuracy.',
         links: [
             {
-                link: 'https://github.com/jasonfyw/orbital-sim',
+                link: 'https://github.com/bakralakhras/AI-Bitcoin_Prediction',
                 icon: <FiGithub />,
             },
         ],
-        headerLink: 'https://github.com/jasonfyw/orbital-sim',
+        headerLink: 'https://github.com/bakralakhras/AI-Bitcoin_Prediction',
     },
     {
-        name: 'PLISMUN',
-        id: 'plismun',
-        type: 'Website',
-        tagline: 'The official website for PLISMUN',
-        tags: [<PHPBadge />, <MySQLBadge />],
-        imageSrc: '/plismun.jpg',
+        name: 'Sentimental Analysis',
+        id: 'nlp',
+        type: 'AI',
+        tagline: 'An AI-driven sentiment analysis application.',
+        tags: [<PythonBadge />, <JupyterBadge />,<AiBadge/>],
+        imageSrc: '/sentiment.jpg',
         description:
-            "A platform for my high school's annual international MUN conference, built from the ground up providing a delegate application system, admin tools, analytics, and resource hub. It managed hundreds of users from dozens of countries.",
+            "A sentiment analysis model built with Python, leveraging NLP techniques to analyze text data and classify sentiments as positive, negative, or neutral. The project utilizes libraries such as TensorFlow and NLTK, with a focus on data preprocessing, model training, and evaluation.",
         links: [
             {
-                link: 'https://github.com/jasonfyw/plismun',
+                link: 'https://github.com/bakralakhras/AI-Sentimental-Analysis',
                 icon: <FiGithub />,
             },
             {
-                link: 'https://plismun.com',
+                link: 'https://github.com/bakralakhras/AI-Sentimental-Analysis',
                 icon: <FiLink />,
             },
         ],
-        headerLink: 'https://plismun.com',
+        headerLink: 'https://github.com/bakralakhras/AI-Sentimental-Analysis',
     },
     {
-        name: 'Photography Portfolio',
-        id: 'photography-portfolio',
+        name: 'WildRydes',
+        id: 'aws-portfolio',
         type: 'Website',
-        tagline: 'A portfolio website for my photography',
-        tags: [<ReactBadge />, <TypescriptBadge />],
-        imageSrc: '/photography-portfolio.png',
+        tagline: 'A serverless web application powered by AWS',
+        tags: [<AWSBadge/>, <ReactBadge />],
+        imageSrc: '/aws_web.jpg',
         description:
-            'A portfolio website for my photography work, built with React and Typescript and styled with ChakraUI. Features a custom-built gallery, e-commerce functionality, and 3D map integration with Mapbox.',
+            'A fully serverless web application built on AWS, featuring user authentication with Amazon Cognito, backend processing with AWS Lambda, and data storage using DynamoDB. The project integrates various AWS services to provide scalability, security, and efficient resource management.',
         links: [
             {
-                link: 'https://photo.jasonfyw.com/',
+                link: 'https://github.com/bakralakhras/wildrydes-site',
                 icon: <FiLink />,
             },
         ],
     },
     {
-        name: 'Linky',
-        id: 'linky',
+        name: 'MuslimPal',
+        id: 'muslim-pal',
         type: 'Web app',
-        tagline: 'A modern, lightweight link shortener',
+        tagline: 'An Islamic lifestyle companion app.',
         tags: [
-            <ReactBadge />,
-            <TypescriptBadge />,
-            <NodeBadge />,
-            <MongoBadge />,
+            <DartBadge />,
+            <FlutterBadge />,
         ],
-        imageSrc: '/linky.png',
+        imageSrc: '/mosque_icon.jpg',
         description:
-            'A lightweight and simple to use link shortener web app with a NodeJS REST API and a frontend built with ChakraUI. Features additional functions like QR codes and alternative URL formats.',
+            'A web application designed to assist Muslims in daily religious practices by providing features such as prayer time notifications, Quranic verses, and Islamic event tracking. Built using Python and Flask, with a user-friendly interface and integration of APIs for real-time updates.',
         links: [
             {
-                link: 'https://github.com/jasonfyw/linky',
+                link: 'https://github.com/bakralakhras/Muslim_pal',
                 icon: <FiGithub />,
             },
             {
-                link: 'https://lnky.to',
+                link: 'https://github.com/bakralakhras/Muslim_pal',
                 icon: <FiLink />,
             },
         ],
-        headerLink: 'https://lnky.to',
+        headerLink: 'https://github.com/bakralakhras/Muslim_pal',
     },
-    {
-        name: 'Blogging Application',
-        id: 'blogging-app',
-        type: 'Web app',
-        tagline:
-            'Java blogging application built using CLEAN architecture and SOLID principles',
-        tags: [<JavaBadge />],
-        imageSrc: '/blogging-app.jpg',
-        description:
-            'Our group project for CSC207 - a blogging website where users can post text content and follow other accounts. Designed and built according to CLEAN architecture and SOLID principles.',
-        links: [
-            {
-                link: 'https://github.com/jasonfyw/csc207-blogging-app',
-                icon: <FiGithub />,
-            },
-        ],
-        headerLink: 'https://github.com/jasonfyw/csc207-blogging-app',
-    },
-    {
-        name: 'Breakout in MIPS',
-        id: 'breakout-asm',
-        type: 'Game',
-        tagline: 'Atari Breakout implemented in MIPS Assembly for CSC258',
-        tags: [<AssemblyBadge />],
-        imageSrc: '/breakout-asm.png',
-        description:
-            'Using MIPS Assembly to implement an Atari Breakout clone with features such as game controls, multiple lives, displaying score, and more.',
-        links: [
-            {
-                link: 'https://github.com/jasonfyw/csc258-project',
-                icon: <FiGithub />,
-            },
-        ],
-        headerLink: 'https://github.com/jasonfyw/csc258-project',
-    },
+      
+   
+
 ]

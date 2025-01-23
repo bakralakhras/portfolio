@@ -26,11 +26,11 @@ const Footer: FC = () => {
             textAlign='left'
         >
             <Flex alignItems={'center'} px={2}>
-                <Text mr={2}>
-                    © {new Date().getFullYear()} Jason Wang – made with &nbsp;
+               {/*  <Text mr={2}>
+                    © {new Date().getFullYear()} Bakr Alakhras – made with &nbsp;
                     <Icon as={FaHeart} fontSize={'0.65rem'} color={'#BF616A'} />
                     &nbsp; using ReactJS
-                </Text>
+                </Text> */}
                 <Spacer />
                 <Socials
                     color={useColorModeValue('#5a657c', '#9199a9')}

@@ -10,7 +10,6 @@ import {
 import {
     SiFlask,
     SiHtml5,
-    SiJava,
     SiPhp,
     SiPython,
     SiReact,
@@ -34,12 +33,21 @@ import {
     SiChakraui,
     SiDjango,
     SiPostman,
+    SiTerraform,
+    
+    SiFlutter,
+    SiKubernetes,
+    SiGithubactions,
+    SiMicrosoftazure,
 } from 'react-icons/si'
 import { Element } from 'react-scroll'
 import Fade from 'react-reveal/Fade'
 import SkillSection from './SkillSection'
 import SkillItem from './SkillItem'
 import Card from '../generics/Card'
+import { FaJava } from 'react-icons/fa';  // FontAwesome Java Icon
+
+import { textSpanIsEmpty } from 'typescript'
 
 const Skills: FC = () => {
     return (
@@ -66,33 +74,20 @@ const Skills: FC = () => {
                             >
                                 <SkillSection title={'Languages'}>
                                     <SkillItem icon={SiPython} name='Python' />
-                                    <SkillItem
-                                        icon={SiTypescript}
-                                        name='Typescript'
-                                    />
-                                    <SkillItem icon={SiJava} name='Java' />
-                                    <SkillItem icon={SiPhp} name='PHP' />
+                                    <SkillItem icon={FaJava} name='Java' />
+                                    <SkillItem icon={SiFlutter} name='Flutter' />
                                     <SkillItem icon={SiHtml5} name='HTML/CSS' />
                                     <SkillItem icon={SiGo} name='Golang' />
-                                    <SkillItem icon={SiC} name='C' />
-                                    <SkillItem icon={SiCsharp} name='C#' />
+                                    <SkillItem icon={SiTerraform} name='Terraform' />
+                                    
                                 </SkillSection>
                                 <SkillSection title={'Frameworks'}>
+                           
                                     <SkillItem icon={SiReact} name='ReactJS' />
-                                    <SkillItem
-                                        icon={SiNodedotjs}
-                                        name='NodeJS'
-                                    />
-                                    <SkillItem
-                                        icon={SiDotnet}
-                                        name='.NET Core'
-                                    />
+                                
                                     <SkillItem icon={SiFlask} name='Flask' />
-                                    <SkillItem icon={SiDjango} name='Django' />
-                                    <SkillItem
-                                        icon={SiChakraui}
-                                        name='ChakraUI'
-                                    />
+                                
+                
                                     <SkillItem
                                         icon={SiBootstrap}
                                         name='Bootstrap'
@@ -128,20 +123,24 @@ const Skills: FC = () => {
                                         icon={SiMongodb}
                                         name='MongoDB'
                                     />
-                                    <SkillItem
-                                        icon={SiFirebase}
-                                        name='Firestore'
-                                    />
+            
                                 </SkillSection>
                                 <SkillSection title={'Other tools'}>
+                                <SkillItem icon={SiAmazonaws} name='AWS' />
+                                <SkillItem icon={SiMicrosoftazure} name='Azure' />
+                                <SkillItem icon={SiDocker} name='Docker' />
+                                <SkillItem icon={SiKubernetes} name='Kubernetes' />
+                                <SkillItem icon={SiGithubactions} name='Git Actions' />
                                     <SkillItem icon={SiGit} name='Git' />
                                     <SkillItem icon={SiLatex} name='LaTeX' />
-                                    <SkillItem icon={SiDocker} name='Docker' />
+                                  
+                                    
+                                   
                                     <SkillItem
                                         icon={SiVisualstudiocode}
                                         name='VS Code'
                                     />
-                                    <SkillItem icon={SiAmazonaws} name='AWS' />
+                                  
                                     <SkillItem
                                         icon={SiPostman}
                                         name='Postman'
