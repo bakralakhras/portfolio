@@ -1,4 +1,3 @@
-import React from 'react'
 import { Container, Heading, VStack } from '@chakra-ui/react'
 import Fade from 'react-reveal/Fade'
 import { Element } from 'react-scroll'

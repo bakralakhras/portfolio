@@ -1,8 +1,6 @@
 import { FC } from 'react'
 import {
     Box,
-    Text,
-    Icon,
     useColorModeValue,
     Flex,
     Spacer,

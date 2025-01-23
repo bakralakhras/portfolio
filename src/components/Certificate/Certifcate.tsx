@@ -1,9 +1,7 @@
-import React from 'react'
 import { Container, Heading, VStack } from '@chakra-ui/react'
 import Fade from 'react-reveal/Fade'
 import { Element } from 'react-scroll'
 import CertifcateCard from './CerticateCard'
-import { experienceData } from '../../data/experienceData'
 import { certificateData } from '../../data/certificateData'
 
 const Experience = () => {

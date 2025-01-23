@@ -2,7 +2,6 @@
 import { CertificateData } from './types'
 import az104 from '../media/az_104.png'
 import az900 from '../media/az900.png'
-import eartech from '../media/eartech_logo.jpeg'
 import aws_sol from '../media/aws_solutions.png'
 
 export const certificateData: CertificateData[] = [

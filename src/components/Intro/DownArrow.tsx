@@ -1,4 +1,3 @@
-import React from 'react'
 import './DownArrow.css'
 
 const DownArrow = () => {

@@ -1,5 +1,5 @@
 import { Box, useColorModeValue } from '@chakra-ui/react'
-import React from 'react'
+
 
 const Background = () => {
     const dotPattern = encodeURIComponent(`
