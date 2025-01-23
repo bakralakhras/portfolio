@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[488],{9488:(e,s,a)=>{e.exports=a.p+"static/media/linky.f56455433636236fb7a2.md"}}]);

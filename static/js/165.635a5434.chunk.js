@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk=self.webpackChunk||[]).push([[165],{7165:(e,a,p)=>{e.exports=p.p+"static/media/petpal.71b9b91436188ad352a3.md"}}]);
