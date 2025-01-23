@@ -7,7 +7,6 @@ import {
     IconButton,
     Stack,
 } from '@chakra-ui/react'
-import { FaHeart } from 'react-icons/fa'
 import Socials from '../global/Socials'
 import { ChevronUpIcon } from '@chakra-ui/icons'
 import { ColorModeSwitcher } from '../../ColorModeSwitcher'

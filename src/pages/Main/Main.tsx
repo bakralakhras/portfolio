@@ -1,4 +1,3 @@
-import React from 'react'
 import Intro from '../../components/Intro'
 import About from '../../components/About'
 import Projects from '../../components/Projects'
@@ -8,7 +7,6 @@ import Nav from '../../components/Nav'
 import Experience from '../../components/Experience'
 import Certificates from '../../components/Certificate'
 import Background from '../../components/Background'
-import { Certificate } from 'crypto'
 
 const Main = () => {
     return (

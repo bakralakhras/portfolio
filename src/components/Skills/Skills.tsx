@@ -10,10 +10,8 @@ import {
 import {
     SiFlask,
     SiHtml5,
-    SiPhp,
     SiPython,
     SiReact,
-    SiTypescript,
     SiBootstrap,
     SiMysql,
     SiMongodb,
@@ -22,19 +20,11 @@ import {
     SiLatex,
     SiDocker,
     SiGo,
-    SiNodedotjs,
     SiPostgresql,
-    SiC,
-    SiFirebase,
-    SiCsharp,
-    SiDotnet,
     SiAmazonaws,
     SiTailwindcss,
-    SiChakraui,
-    SiDjango,
     SiPostman,
     SiTerraform,
-    
     SiFlutter,
     SiKubernetes,
     SiGithubactions,
@@ -47,7 +37,7 @@ import SkillItem from './SkillItem'
 import Card from '../generics/Card'
 import { FaJava } from 'react-icons/fa';  // FontAwesome Java Icon
 
-import { textSpanIsEmpty } from 'typescript'
+
 
 const Skills: FC = () => {
     return (
