@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[196],{5196:(e,o,s)=>{e.exports=s.p+"static/media/orbital-sim.c264f99b0d2e2b971e28.md"}}]);
