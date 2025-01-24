@@ -1,9 +1,17 @@
-# My Portfolio Website
+# Portfolio  
+![GitHub last commit](https://img.shields.io/github/last-commit/bakralakhras/portfolio?style=flat-square)
+![GitHub repo size](https://img.shields.io/github/repo-size/bakralakhras/portfolio?style=flat-square)
+![GitHub license](https://img.shields.io/github/license/bakralakhras/portfolio?style=flat-square)
 
-Welcome to my personal portfolio website! This project showcases my skills, experience, and projects as a **Cloud Engineer / Software Engineer**, focusing on **DevOps, CI/CD, and Python.**  
-The site is built with modern technologies and best practices to ensure performance, scalability, and security.
+Welcome to my personal portfolio website! This project is designed as an **AWS Cloud Solution**, inspired by the **Cloud Resume Challenge**, to showcase my skills and experience as a **Cloud Engineer / Software Engineer**, with a strong focus on **DevOps, CI/CD, and Python.**  
 
-![Portfolio Preview](https://your-image-link-here.com/preview.png)
+This portfolio is hosted on **AWS**, leveraging cloud-native services to ensure **scalability, reliability, and security.** It incorporates key AWS services such as **S3** for *static hosting*, **CloudFront** for *content delivery*, and **AWS Lambda** for *serverless backend functionalities.*  
+
+Infrastructure as Code (IaC) is implemented using **Terraform**, enabling consistent and automated deployment of cloud resources. The CI/CD pipeline is powered by **GitHub Actions** and **AWS CodePipeline**, automating deployment processes and ensuring a seamless workflow.
+
+
+
+![Portfolio_Preview](https://github.com/user-attachments/assets/7f66e8e4-a75f-43a3-9523-8c3679328e37)
 
 ---
 
@@ -16,14 +24,22 @@ Check out the portfolio live at:
 
 ---
 
+## Overview:
+![c1 drawio](https://github.com/user-attachments/assets/240a2925-1620-4334-8d93-d9e74cb30a78)
+
+
+
+---
 ## 🛠️ Technologies Used
 
 | Category          | Technologies                                          |
 |------------------|-------------------------------------------------------|
+| **Cloud**         | AwS, AWS Lambda, S3, DynamoDB, AWS CloudFront                              |
 | **Frontend**      | HTML5, CSS3, JavaScript (ES6+)                         |
 | **Frameworks**    | React.js / Vue.js *(if applicable)*                    |
 | **Deployment**    | AWS S3, CloudFront                                     |
-| **CI/CD**         | GitHub Actions, Terraform                              |
+| **CI/CD**         | GitHub Actions                                         |
+| **IaC**           | Terraform                                              |
 | **Styling**       | Bootstrap, Tailwind CSS                                |
 | **Version Control** | Git, GitHub                                          |
 
