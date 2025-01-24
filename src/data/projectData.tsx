@@ -22,17 +22,17 @@ export const projectData: ProjectT[] = [
         id: 'cloudresume',
         type: 'AWS app',
         tagline: 'A cloud-powered resume built with AWS services.',
-        tags: [<AWSBadge />, <TerraformBadge /> ,<ReactBadge/>,<DynamoDBBadge/>],
+        tags: [<AWSBadge />, <TerraformBadge /> ,<ReactBadge/>,<DynamoDBBadge/>, <ReactBadge/>],
         imageSrc: '/cloud_resume.png',
         description:
             'A serverless resume website hosted on AWS, featuring a visitor counter powered by AWS Lambda, API Gateway, and DynamoDB. The project is deployed with S3 and CloudFront for global distribution, with automated CI/CD workflows using GitHub Actions.',
         links: [
             {
-                link: 'https://github.com/bakralakhras/Aws_Cloud_Resume',
+                link: 'https://github.com/bakralakhras/portfolio',
                 icon: <FiGithub />,
             },
         ],
-        headerLink: 'https://github.com/bakralakhras/Aws_Cloud_Resume',
+        headerLink: 'https://github.com/bakralakhras/portfolio',
 
 
     },
