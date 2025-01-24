@@ -18,7 +18,7 @@ jobs:
       - name: Build the project
         run: npm run build  # Ensure package.json has a build script
 
-      - uses: jakejarvis/s3-sync-action@v0.6.0
+      - uses: jakejarvis/s3-sync-action@master
         with:
           args: --acl public-read --follow-symlinks --delete
         env:
