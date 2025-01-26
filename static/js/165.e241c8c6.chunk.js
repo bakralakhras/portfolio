@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[165],{7165:(p,e,t)=>{p.exports=t.p+"static/media/petpal.71b9b91436188ad352a3.md"}}]);

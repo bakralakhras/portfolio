@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[334],{8334:(e,s,t)=>{e.exports=t.p+"static/media/street-savvy.2ebd4fe13990393ee11e.md"}}]);
