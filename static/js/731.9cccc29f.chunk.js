@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[731],{731:(e,p,s)=>{e.exports=s.p+"static/media/plismun.7e7abc8146ce8371f63e.md"}}]);
