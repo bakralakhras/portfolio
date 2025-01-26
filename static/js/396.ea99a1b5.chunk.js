@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[396],{396:(t,e,o)=>{t.exports=o.p+"static/media/twitter-geo-sentiment.58348df50f3d882b4d37.md"}}]);
