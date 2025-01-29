@@ -19,7 +19,7 @@ import { ProjectT } from './types'
 export const projectData: ProjectT[] = [
     {
         name: 'Cloud Resume',
-        id: 'cloudresume',
+        id: 'public/cloudresume',
         type: 'AWS app',
         tagline: 'A cloud-powered resume built with AWS services.',
         tags: [<AWSBadge />, <TerraformBadge /> ,<ReactBadge/>,<DynamoDBBadge/>, <ReactBadge/>],
