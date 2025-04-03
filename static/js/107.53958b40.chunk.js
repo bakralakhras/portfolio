@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[107],{4107:(a,o,p)=>{a.exports=p.p+"static/media/blogging-application.a1138d730a6f177a4835.md"}}]);
