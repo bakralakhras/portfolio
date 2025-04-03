@@ -18,7 +18,7 @@ Infrastructure as Code (IaC) is implemented using **Terraform**, enabling consis
 ## 🌐 Live Demo
 
 Check out the portfolio live at:  
-**[🔗 Visit My Portfolio](https://d2pr1hs1r9sp2e.cloudfront.net/)**
+**[🔗 Visit My Portfolio](https://bakralakhras.github.io/portfolio/)**
 
 
 
