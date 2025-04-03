@@ -54,7 +54,7 @@ const Intro: FC = () => {
                         </Box>
                     </Fade>
                     <Link
-                        href={'/Bakr_resume.pdf'}
+                        href={'./Data_analyst_BAKR.pdf'}
                         isExternal
                         _hover={{ textDecor: 'none' }}
                     >

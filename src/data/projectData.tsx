@@ -19,11 +19,11 @@ import { ProjectT } from './types'
 export const projectData: ProjectT[] = [
     {
         name: 'Cloud Resume',
-        id: 'public/cloudresume',
+        id: './cloudresume.png',
         type: 'AWS app',
         tagline: 'A cloud-powered resume built with AWS services.',
         tags: [<AWSBadge />, <TerraformBadge /> ,<ReactBadge/>,<DynamoDBBadge/>, <ReactBadge/>],
-        imageSrc: '/cloud_resume.png',
+        imageSrc: './cloud_resume.png',
         description:
             'A serverless resume website hosted on AWS, featuring a visitor counter powered by AWS Lambda, API Gateway, and DynamoDB. The project is deployed with S3 and CloudFront for global distribution, with automated CI/CD workflows using GitHub Actions.',
         links: [
@@ -47,7 +47,7 @@ export const projectData: ProjectT[] = [
             <ReactBadge />,
             <PythonBadge />,
         ],
-        imageSrc: '/azure_webapp.png',
+        imageSrc: './azure_webapp.png',
         description:
             'An automated CI/CD pipeline leveraging GitHub Actions to deploy a containerized Flask web application to Azure App Service. The project utilizes Docker for containerization, Azure Container Registry for storage, and monitors performance with Prometheus and Grafana.',
         links: [
@@ -64,7 +64,7 @@ export const projectData: ProjectT[] = [
         type: 'IaC',
         tagline: 'A scalable cloud infrastructure deployment using Terraform.',
         tags: [<TerraformBadge />, <AWSBadge />, <AzureBadge /> ,<IacBadge/>],
-        imageSrc: '/terraform_solution.jpg',
+        imageSrc: './terraform_solution.jpg',
         description:
             "An infrastructure-as-code solution utilizing Terraform to provision and manage scalable cloud resources on Azure. The project ensures high availability, automated deployments, and security best practices, with modular configurations for efficient resource management.",
         links: [
@@ -83,7 +83,7 @@ export const projectData: ProjectT[] = [
         tagline:
             'A real-time system monitoring web application.',
         tags: [<ReactBadge />, <TypescriptBadge />],
-        imageSrc: '/monitor_app.jpg',
+        imageSrc: './monitor_app.jpg',
         description:
             'A Flask-based monitoring application that tracks system metrics such as CPU and memory usage in real-time. The project features interactive visualizations using Plotly and automated alerts for performance thresholds, ensuring proactive system management.',
         links: [
@@ -105,7 +105,7 @@ export const projectData: ProjectT[] = [
         tagline:
             'An AI-powered Bitcoin price prediction model.',
         tags: [<PythonBadge />, <JupyterBadge/> , <AiBadge/>],
-        imageSrc: '/bitcoin_prediction.jpg',
+        imageSrc: './bitcoin_prediction.jpg',
         description:
             'A machine learning model utilizing Python and libraries such as TensorFlow and Scikit-learn to analyze historical Bitcoin data and predict future prices. The project includes data preprocessing, feature engineering, and performance evaluation to enhance forecasting accuracy.',
         links: [
@@ -122,7 +122,7 @@ export const projectData: ProjectT[] = [
         type: 'AI',
         tagline: 'An AI-driven sentiment analysis application.',
         tags: [<PythonBadge />, <JupyterBadge />,<AiBadge/>],
-        imageSrc: '/sentiment.jpg',
+        imageSrc: './sentiment.jpg',
         description:
             "A sentiment analysis model built with Python, leveraging NLP techniques to analyze text data and classify sentiments as positive, negative, or neutral. The project utilizes libraries such as TensorFlow and NLTK, with a focus on data preprocessing, model training, and evaluation.",
         links: [
@@ -143,7 +143,7 @@ export const projectData: ProjectT[] = [
         type: 'Website',
         tagline: 'A serverless web application powered by AWS',
         tags: [<AWSBadge/>, <ReactBadge />],
-        imageSrc: '/aws_web.jpg',
+        imageSrc: './aws_web.jpg',
         description:
             'A fully serverless web application built on AWS, featuring user authentication with Amazon Cognito, backend processing with AWS Lambda, and data storage using DynamoDB. The project integrates various AWS services to provide scalability, security, and efficient resource management.',
         links: [
@@ -162,7 +162,7 @@ export const projectData: ProjectT[] = [
             <DartBadge />,
             <FlutterBadge />,
         ],
-        imageSrc: '/mosque_icon.jpg',
+        imageSrc: './mosque_icon.jpg',
         description:
             'A web application designed to assist Muslims in daily religious practices by providing features such as prayer time notifications, Quranic verses, and Islamic event tracking. Built using Python and Flask, with a user-friendly interface and integration of APIs for real-time updates.',
         links: [
