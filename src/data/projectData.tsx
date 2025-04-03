@@ -18,6 +18,28 @@ import { ProjectT } from './types'
 
 export const projectData: ProjectT[] = [
     {
+        name: 'SentinelAI-Native',
+        id: 'AI-Remedy',
+        type: 'AIOps',
+        tagline: 'Autonomous Cloud Incident Response Engine — Powered by AI, Built for Scale.',
+        tags: [
+            <AzureBadge/>,
+            <DockerBadge />,
+            <AiBadge />,
+            <PythonBadge />,
+        ],
+        imageSrc: './system.jpg',
+        description:
+            'SentinelAI is an autonomous cloud incident responder that detects, analyzes, and resolves infrastructure issues in real time. Built with FastAPI, Prometheus, and Cohere integration, it triggers self-healing scripts and Slack alerts on demand. Designed for scalability with Docker, Terraform, and Azure AKS, it brings intelligent automation to modern DevOps workflows.',
+        links: [
+            {
+                link: 'https://github.com/bakralakhras/SentinelAI-Native',
+                icon: <FiGithub />,
+            },
+        ],
+        headerLink: 'https://github.com/bakralakhras/Azure-Docker-CI-CD-WebApp',
+    },
+    {
         name: 'Cloud Resume',
         id: './cloudresume.png',
         type: 'AWS app',
