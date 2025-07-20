@@ -14,6 +14,8 @@ import {
     FlutterBadge,
     LookerBiBadge,
     GCPBadge,
+    HelmBadge,
+    KubernetesBadge
 } from '../components/Projects/TechBadges'
 import { FiGithub, FiLink } from 'react-icons/fi'
 import { ProjectT } from './types'
@@ -21,6 +23,31 @@ import { ProjectT } from './types'
 
 
 export const projectData: ProjectT[] = [
+        {
+        name: 'IncidentVault Microservice',
+        id: 'incidentvault',
+        type: 'DevSecOps',
+        tagline: 'A production-grade FastAPI microservice for incident reporting with CI/CD, observability, and IaC.',
+        tags: [
+            <PythonBadge />,
+            <DockerBadge />,
+            <TerraformBadge />,
+            <AiBadge />, 
+            <HelmBadge />,
+            <KubernetesBadge/>
+
+        ],
+        imageSrc: '/incidentvault.jpg', // optional thumbnail
+        description:
+            'IncidentVault is a modular, test-driven FastAPI microservice for reporting and managing incidents. It includes CI/CD pipelines with GitHub Actions, observability with Prometheus, database migrations via Alembic, and future-ready cloud infrastructure using Terraform and Helm. Built to scale, secure, and ship fast.',
+        links: [
+            {
+                link: 'https://github.com/bakralakhras/incidentvault',
+                icon: <FiGithub />,
+            },
+        ],
+        headerLink: 'https://github.com/bakralakhras/incidentvault',
+    },
      {
     name: 'Capstone Project - Customer Segmentation',
     id: 'Customer Segmentation',
@@ -86,6 +113,27 @@ export const projectData: ProjectT[] = [
 
     },
     {
+    name: 'GenAgent CLI',
+    id: 'genagent-cli',
+    type: 'AI Tool',
+    tagline: 'An AI-powered terminal assistant using Gemini to edit code, fix bugs, and push to GitHub.',
+    tags: [
+        <PythonBadge />,
+        <AiBadge />,
+    ],
+    imageSrc: '/cli_agent.jpg',
+    description:
+        'GenAgent CLI is a natural-language-driven terminal assistant powered by Google Gemini. It interprets plain English commands to read, write, fix, and run Python code — all while maintaining security with path traversal prevention and Git integration. It even commits and pushes changes to GitHub automatically when instructed.',
+    links: [
+        {
+            link: 'https://github.com/bakralakhras/GenAgent--CLI',
+            icon: <FiGithub />,
+        },
+    ],
+    headerLink: 'https://github.com/bakralakhras/GenAgent--CLI',
+},
+
+    {
     name: 'Asteroid Game',
     id: 'asteroid-shooter',
     type: 'Game Dev',
@@ -94,7 +142,7 @@ export const projectData: ProjectT[] = [
         <PythonBadge />,
         <AiBadge />, 
     ],
-    imageSrc: '/asteroid_thumb.jpg',
+    imageSrc: '/aestroid.jpg',
     description:
         'A real-time asteroid shooter game built using Python and Pygame. Includes WASD controls, shooting mechanics, object collisions, and modular game design. Developed using OOP principles with plans to expand gameplay features.',
     links: [
