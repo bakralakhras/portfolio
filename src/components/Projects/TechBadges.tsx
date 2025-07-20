@@ -16,6 +16,12 @@ export const DynamoDBBadge = () => {
 export const PythonBadge = () => {
     return <Badge colorScheme={'blue'}>Python</Badge>
 }
+
+export const HelmBadge = () => {
+    return <Badge colorScheme={'orange'}>Helm</Badge>
+}
+
+
 export const LookerBiBadge = () => {
     return <Badge colorScheme={'teal'}>LooberBi</Badge>
 }
