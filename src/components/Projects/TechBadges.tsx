@@ -16,6 +16,12 @@ export const DynamoDBBadge = () => {
 export const PythonBadge = () => {
     return <Badge colorScheme={'blue'}>Python</Badge>
 }
+export const LookerBiBadge = () => {
+    return <Badge colorScheme={'teal'}>LooberBi</Badge>
+}
+export const GCPBadge = () => {
+    return <Badge colorScheme={'white'}>GCP</Badge>
+}
 export const JupyterBadge = () => {
     return <Badge colorScheme={'blue'}>Jupyter</Badge>
 }

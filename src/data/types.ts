@@ -12,6 +12,7 @@ export interface ProjectT {
     tags?: ReactElement[]
     tagline?: string
     imageSrc?: string
+    videoSrc?: string 
     description?: string
     links?: LinkT[]
     headerLink?: string

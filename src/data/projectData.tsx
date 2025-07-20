@@ -12,11 +12,38 @@ import {
     AiBadge,
     DartBadge,
     FlutterBadge,
+    LookerBiBadge,
+    GCPBadge,
 } from '../components/Projects/TechBadges'
 import { FiGithub, FiLink } from 'react-icons/fi'
 import { ProjectT } from './types'
 
+
+
 export const projectData: ProjectT[] = [
+     {
+    name: 'Capstone Project - Customer Segmentation',
+    id: 'Customer Segmentation',
+    type: 'Data App',
+    tagline: 'ML-powered customer segmentation pipeline with Streamlit, Azure SQL, and Looker BI.',
+    tags: [
+        <PythonBadge />,
+        <LookerBiBadge />, 
+        <GCPBadge />,
+        <AzureBadge />,  
+        <AiBadge />,
+    ],
+    imageSrc: './capstone_2.jpg', 
+    description:
+        'A modular data pipeline for clustering and enriching customer data using Python, Streamlit, and Azure SQL. Includes auto-cleaning, silhouette-optimized KMeans clustering, normalization, and seamless upload to Azure SQL for Looker dashboards hosted on GCP. Designed for marketing teams and BI workflows.',
+    links: [
+        {
+            link: 'https://github.com/bakralakhras/Capstone_2',
+            icon: <FiGithub />,
+        },
+    ],
+    headerLink: 'https://github.com/bakralakhras/Capstone_2',
+},
     {
         name: 'SentinelAI-Native',
         id: 'AI-Remedy',
@@ -58,6 +85,27 @@ export const projectData: ProjectT[] = [
 
 
     },
+    {
+    name: 'Asteroid Game',
+    id: 'asteroid-shooter',
+    type: 'Game Dev',
+    tagline: 'A classic asteroid shooter built with Python and Pygame.',
+    tags: [
+        <PythonBadge />,
+        <AiBadge />, 
+    ],
+    imageSrc: '/asteroid_thumb.jpg',
+    description:
+        'A real-time asteroid shooter game built using Python and Pygame. Includes WASD controls, shooting mechanics, object collisions, and modular game design. Developed using OOP principles with plans to expand gameplay features.',
+    links: [
+        {
+            link: 'https://github.com/bakralakhras/Aestroid_game',
+            icon: <FiGithub />,
+        },
+    ],
+    headerLink: 'https://github.com/bakralakhras/Aestroid_game',
+},
+
     {
         name: 'Azure CI/CD App',
         id: 'Azure app',
