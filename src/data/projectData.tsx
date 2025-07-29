@@ -256,22 +256,6 @@ export const projectData: ProjectT[] = [
         headerLink: 'https://github.com/bakralakhras/AI-Sentimental-Analysis',
     },
     {
-        name: 'WildRydes',
-        id: 'aws-portfolio',
-        type: 'Website',
-        tagline: 'A serverless web application powered by AWS',
-        tags: [<AWSBadge/>, <ReactBadge />],
-        imageSrc: './aws_web.jpg',
-        description:
-            'A fully serverless web application built on AWS, featuring user authentication with Amazon Cognito, backend processing with AWS Lambda, and data storage using DynamoDB. The project integrates various AWS services to provide scalability, security, and efficient resource management.',
-        links: [
-            {
-                link: 'https://github.com/bakralakhras/wildrydes-site',
-                icon: <FiLink />,
-            },
-        ],
-    },
-    {
         name: 'MuslimPal',
         id: 'muslim-pal',
         type: 'Web app',
