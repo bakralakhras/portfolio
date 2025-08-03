@@ -34,15 +34,13 @@ const About: FC = () => {
                             src={headshot}
                             border={`3px solid ${useColorModeValue('#1E2428', '#ECEFF4')}`}
                         />
-                        <VStack spacing={4} p={[10, 4]} pl={[10, 50]}>
+                        <VStack spacing={6} p={[10, 4]} pt={[4, 8]} pl={[10, 50]}>
                             <Fade bottom cascade duration={500}>
                                 <Flex>
                                     <Center p={4}>👋🏼</Center>
                                     <Text>
-                                        Hi, I'm Bakr and I'm a fourth year
-                                        student at{' '}
-                                        <b>Bahcesehir University</b> with a
-                                        passion for <b>Software Engineering</b>
+                                         Hi, I'm <b>Bakr</b> a Software Engineer passionate about building scalable systems, whether it's backend development, infrastructure automation, or DevOps engineering in the cloud.
+
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -50,12 +48,9 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>🎓</Center>
                                     <Text>
-                                        I'm pursuing a Bachelor Degree in {' '}
-                                        <b>
-                                            Software Engineering
-                                        </b>{' '}
-                                        and <b>I'm a High-Honor Student</b>,
-                                        graduating class of 2025.
+                                        I recently graduated from{' '}
+                                        <b>Bahçeşehir University</b> with a degree in{' '}
+                                        <b>Software Engineering</b>, ranking in the <b>top 5%</b> of my class and making the High Honor List.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -63,12 +58,7 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>👨🏻‍💻</Center>
                                     <Text>
-                                        I am currently an <b>Aspiring Software and Cloud Engineer</b> and I have previously held a position as a{' '}
-                                        <b>
-                                            Cloud Engineering Intern at
-                                            PwC
-                                        </b>{' '}
-                                        working in Cloud development.
+                                        I’ve completed DevOps internships at <b>PwC Middle East</b> and <b>EarTech</b>, where I worked with <b>Azure, Terraform, Kubernetes</b>, and automated cloud operations using <b>Python</b>.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -76,12 +66,7 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>🚀</Center>
                                     <Text>
-                                        I'm experienced in DevOps - particularly with{' '}
-                                        <b>Azure, Aws</b> and <b>Python</b>.{' '}
-                                        <b>Terraform</b> is my Infrastructure as Code
-                                        of choice and I've worked in backend
-                                        with{' '}
-                                        <b>Java,</b> and <b>Python</b>.
+                                        I'm skilled in <b>Azure, AWS, Python</b>, and <b>Terraform</b> is my go-to for Infrastructure as Code. I’ve built scalable backend systems using <b>Java</b> and <b>Python</b>, with CI/CD pipelines and containerized services.
                                     </Text>
                                 </Flex>
                             </Fade>
@@ -89,10 +74,7 @@ const About: FC = () => {
                                 <Flex>
                                     <Center p={4}>🧠</Center>
                                     <Text>
-                                        In addition to Software Engineering, I
-                                        am also interested in the confluence of
-                                        artificial intelligence!, Espically LLMS and leverging AI to be more optimal.
-                        
+                                        I'm also deeply interested in <b>AI and LLMs</b> especially how they can enhance developer workflows and infrastructure automation.
                                     </Text>
                                 </Flex>
                             </Fade>

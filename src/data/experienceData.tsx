@@ -3,22 +3,22 @@ import pwc from '../media/pwc_logo.png'
 import eartech from '../media/eartech_logo.jpeg'
 
 export const experienceData: ExperienceData[] = [
-    {
-        title: 'Cloud Engineer Intern',
-        company: 'PwC',
-        location: 'Amman, JO',
-        dates: 'July 2024 - August 2024',
-        description:
-            'Building Scalable Cloud Solutions, Using DevOps methodologies. Integerated CI/CD pipeline to the workflow and helping automate tasks with python.',
-        logoSrc: pwc
-    },
-    {
-        title: 'Software Engineer',
-        company: 'EarTech IT',
-        location: 'Istanbul, TR',
-        dates: 'June 2023 - Jan 2024',
-        description:
-            'Developed and optimized Python-based solutions for cloud applications, focusing on automation, data processing, and performance improvements using Azure services. Collaborated with senior engineers to enhance application efficiency and authored technical documentation for seamless onboarding and system maintenance.',
-        logoSrc: eartech
-    }
+  {
+    title: 'Cloud Consultant Intern',
+    company: 'PwC Middle East',
+    location: 'Amman, Jordan',
+    dates: 'Aug 2024 - Oct 2024',
+    description:
+      'Deployed containerized apps on Azure using Docker and Terraform. Built CI/CD pipelines, automated infra tasks with Python, and implemented system monitoring with Prometheus and Grafana.',
+    logoSrc: pwc
+  },
+  {
+    title: 'DevOps Intern',
+    company: 'EarTech IT',
+    location: 'Istanbul, Turkey',
+    dates: 'Nov 2023 - Jan 2024',
+    description:
+      'Developed Python-based services on Azure. Automated workflows with CI/CD, integrated SQL and Cognitive Search, and optimized cloud performance using Blob Storage and CDN.',
+    logoSrc: eartech
+  }
 ]
