@@ -37,7 +37,7 @@ export const projectData: ProjectT[] = [
             <KubernetesBadge/>
 
         ],
-        imageSrc: './incident_vault.jpg', 
+        imageSrc: './incident_vault.png', 
         description:
             'IncidentVault is a modular, test-driven FastAPI microservice for reporting and managing incidents. It includes CI/CD pipelines with GitHub Actions, observability with Prometheus, database migrations via Alembic, and future-ready cloud infrastructure using Terraform and Helm. Built to scale, secure, and ship fast.',
         links: [
