@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bakr AlAkhras — Infrastructure & System Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+
+<!-- ======= NAV ======= -->
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="#" class="brand">Bakr Alakhras.</a>
+    <div class="nav-links">
+      <a href="#projects">Projects</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ======= HERO ======= -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow hero-eyebrow">Infrastructure &amp; System Engineer</span>
+        <h1 class="h-display">
+          I build platforms<br/>
+          that <span class="accent">hold</span> at scale.
+        </h1>
+        <p class="lead">
+          From bare-metal RHEL clusters to GitOps-managed OpenShift environments, I design and operate the infrastructure that production systems depend on. Platform engineering, data infrastructure, and automation — built to last.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#projects">View Projects</a>
+          <a class="btn btn-outline" href="#case-studies">Case Studies</a>
+          <a class="btn btn-ghost" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer">
+            <svg class="ico" viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            GitHub
+          </a>
+          <a class="btn btn-ghost" href="#">
+            Resume
+            <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- ======= CLUSTER CARD ======= -->
+      <div class="cluster-stage">
+        <div class="cluster-card">
+          <div class="cluster-head">
+            <div class="term-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+            <div class="label">cluster-01 · production</div>
+          </div>
+          <div class="cluster-body">
+            <div class="node-row">
+              <span class="status-dot"></span>
+              <span class="node-name">control-plane-01</span>
+              <span class="bars"><span class="bar" style="--w:62%"></span><span class="bar" style="--w:48%"></span></span>
+              <span class="node-status">Ready</span>
+            </div>
+            <div class="node-row">
+              <span class="status-dot"></span>
+              <span class="node-name">worker-01</span>
+              <span class="bars"><span class="bar" style="--w:74%"></span><span class="bar" style="--w:55%"></span></span>
+              <span class="node-status">Ready</span>
+            </div>
+            <div class="node-row">
+              <span class="status-dot"></span>
+              <span class="node-name">worker-02</span>
+              <span class="bars"><span class="bar" style="--w:58%"></span><span class="bar" style="--w:67%"></span></span>
+              <span class="node-status">Ready</span>
+            </div>
+
+            <div class="cluster-divider"></div>
+
+            <div class="svc-row"><span class="status-dot"></span><span class="name">ArgoCD</span><span class="state">Synced</span></div>
+            <div class="svc-row"><span class="status-dot"></span><span class="name">Kafka</span><span class="state">Running</span></div>
+            <div class="svc-row"><span class="status-dot"></span><span class="name">Prometheus</span><span class="state">Running</span></div>
+            <div class="svc-row"><span class="status-dot amber"></span><span class="name">Vault</span><span class="state amber">Sealed</span></div>
+          </div>
+          <div class="cluster-foot">
+            <span>Last sync: just now</span>
+            <span>v1.28.4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= PROJECTS ======= -->
+<section id="projects">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="h-section">Projects</h2>
+      <p>Production systems, platform builds, and engineering tooling.</p>
+    </div>
+
+    <div class="filters" id="filters">
+      <!-- Rendered from assets/js/data.js -->
+    </div>
+
+    <!-- featured -->
+    <div class="featured-grid" id="featured-projects">
+      <!-- Featured projects render here. -->
+    </div>
+
+    <!-- notable -->
+    <div class="notable-grid" id="notable-projects">
+      <!-- Notable projects render here. -->
+    </div>
+
+    <div class="archive">
+      <a class="btn btn-ghost" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer">View 15 more projects
+        <svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ======= CASE STUDIES ======= -->
+<section id="case-studies">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="h-section">Case Studies</h2>
+      <p>Architecture decisions and engineering tradeoffs.</p>
+    </div>
+
+    <div class="cs-grid" id="case-study-grid">
+      <!-- Case studies render here. -->
+    </div>
+  </div>
+</section>
+
+<!-- ======= SKILLS ======= -->
+<section id="skills">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="h-section">Stack</h2>
+      <p>Tools, platforms, and languages used in production.</p>
+    </div>
+
+    <div class="stack-grid" id="skills-grid">
+      <!-- Skills render here. -->
+    </div>
+  </div>
+</section>
+
+<!-- ======= EXPERIENCE ======= -->
+<section id="experience">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 class="h-section">Experience</h2>
+      <p>Where the production systems get built.</p>
+    </div>
+
+    <div class="timeline" id="experience-timeline">
+      <!-- Experience entries render here. -->
+    </div>
+
+    <div class="edu" id="education-block">
+      <!-- Education renders here. -->
+    </div>
+
+    <div class="certs" id="certification-grid">
+      <!-- Certifications render here. -->
+    </div>
+  </div>
+</section>
+
+<!-- ======= CONTACT ======= -->
+<section id="contact" class="contact">
+  <div class="wrap">
+    <div class="inner">
+      <h2 class="h-section">Let's talk infrastructure.</h2>
+      <p>Open to infrastructure, systems, and DevOps roles. Remote-friendly. Available for technical conversations.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="mailto:bakrfalakhras@gmail.com">Email Me</a>
+        <a class="btn btn-outline" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="btn btn-outline" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a class="btn btn-ghost" href="#">Resume
+          <svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        </a>
+      </div>
+      <div class="loc">Amman, Jordan · Open to relocation</div>
+    </div>
+  </div>
+</section>
+
+<!-- ======= FOOTER ======= -->
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. · 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<div id="cursor-glow"></div>
+
+<script type="module" src="assets/js/app.js"></script>
+
+</body>
+</html>

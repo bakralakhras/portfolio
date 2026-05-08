@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Incident Responder — Case Study · bakr.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="../Portfolio.html" class="brand">bakr.</a>
+    <div class="nav-links">
+      <a href="../Portfolio.html#projects">Projects</a>
+      <a href="../Portfolio.html#experience">Experience</a>
+      <a href="../Portfolio.html#skills">Skills</a>
+      <a href="../Portfolio.html#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<header class="cs-hero">
+  <div class="wrap">
+    <a class="cs-back" href="../Portfolio.html#case-studies">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to case studies
+    </a>
+    <div class="cs-eyebrow-row">
+      <span class="eyebrow accent">DevOps / Automation</span>
+      <span class="status amber"><span class="d"></span>In Development</span>
+    </div>
+    <h1 class="cs-title">AI Incident Responder</h1>
+    <p class="cs-subtitle">An async pipeline that consumes Alertmanager webhooks, enriches them with Prometheus context, and produces structured remediation suggestions via an LLM — without becoming yet another flaky chatbot.</p>
+
+    <div class="cs-meta-grid">
+      <div class="cs-meta-cell"><div class="lab">Role</div><div class="val">Infrastructure &amp; System Engineer</div></div>
+      <div class="cs-meta-cell"><div class="lab">Timeline</div><div class="val">[3 months]</div></div>
+      <div class="cs-meta-cell"><div class="lab">Stack</div><div class="val">FastAPI · Celery · LLM</div></div>
+      <div class="cs-meta-cell"><div class="lab">Status</div><div class="val">In Development</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:64px;padding-bottom:96px;">
+  <div class="wrap">
+    <div class="cs-body">
+      <article class="cs-content">
+
+        <h2 id="overview">Overview</h2>
+        <p>Multi-cluster on-call has a familiar pattern: an alert fires, the responder spends the first three minutes <em>just figuring out where to look</em>. This project closes that gap — every alert gets enriched with the metric context, the recent deploys, and a structured suggestion of what to check first.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Triage time saved</div>
+            <div class="v">~3<span class="unit">min/alert</span></div>
+            <div class="delta down">first-look context</div>
+          </div>
+          <div class="metric">
+            <div class="k">Output format</div>
+            <div class="v">JSON</div>
+            <div class="delta">strict schema</div>
+          </div>
+          <div class="metric">
+            <div class="k">Burst handling</div>
+            <div class="v">async</div>
+            <div class="delta">Celery queue</div>
+          </div>
+        </div>
+
+        <h2 id="problem">The Problem</h2>
+        <p>Alertmanager fires an alert. The pager goes off. The responder logs into Grafana, picks the right dashboard, scrolls, finds the relevant panel, then opens the runbook. <strong>Most of that is mechanical.</strong> The interesting work — deciding what to actually do — comes after.</p>
+
+        <h2 id="approach">The Approach</h2>
+        <p>Treat the LLM as a <strong>structured output generator</strong>, not a chatbot. Webhook in → enrich with measurable context → render a strict prompt template → demand JSON back → render that JSON into a Slack message. No freeform reasoning surfaced to humans on-call.</p>
+
+        <div class="arch-large">
+          <div class="arch-row">
+            <div class="arch-box">Alertmanager</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">FastAPI webhook</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Celery queue</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Worker</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Prometheus query</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Recent deploys</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Runbook lookup</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box accent">Structured prompt</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">LLM (JSON mode)</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Validator</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Slack message</div>
+            <span class="arch-arrow">←</span>
+            <div class="arch-box">Renderer</div>
+            <span class="arch-arrow">←</span>
+            <div class="arch-box accent">Validated JSON</div>
+          </div>
+        </div>
+
+        <h2 id="decisions">Key Decisions &amp; Tradeoffs</h2>
+
+        <h3>Async Celery queue over synchronous API</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Webhook handling</div>
+            <div class="tr-cell"><span class="pick">Webhook → queue → worker</span><br/>Webhook returns 200 immediately. Workers consume, retry, dead-letter.</div>
+            <div class="tr-cell"><span class="skip">Inline LLM call</span><br/>Webhook holds the connection through a 4–8s LLM call. Storms cause cascading timeouts.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">Alert storms are exactly when this thing must not crater. Decoupling makes burst capacity a queue-depth knob.</div>
+            <div class="tr-cell">Alertmanager will retry on 5xx — synchronous failures duplicate work.</div>
+          </div>
+        </div>
+
+        <h3>Structured prompts over freeform</h3>
+        <p>The prompt is a Jinja template that produces a request demanding a strict JSON schema: <code>likely_cause</code>, <code>checks</code> (an array of three steps), <code>severity_assessment</code>, <code>related_runbook</code>. The response is parsed against a Pydantic model; anything that fails validation gets a single retry with the validation error appended, then falls back to a "context-only" message.</p>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">The LLM never sees the responder</div>
+            <p class="d">Output is rendered, not relayed. If the JSON is malformed, the human still gets the enriched context — the LLM piece degrades gracefully.</p>
+          </div>
+        </div>
+
+        <h3>FastAPI over Flask</h3>
+        <p>Native async support matters when the worker side is doing concurrent Prometheus queries. Pydantic for the request schema is a free win — Alertmanager's webhook payload becomes a typed object at the door.</p>
+
+        <h2 id="implementation">Implementation Notes</h2>
+
+        <h3>The validator loop</h3>
+        <div class="snippet">
+          <div class="snippet-head">
+            <span class="fname">workers/triage.py</span>
+            <span class="lang">python</span>
+          </div>
+          <pre><span class="k">class</span> <span class="n">Triage</span>(BaseModel):
+    likely_cause: <span class="n">str</span>
+    checks: <span class="n">list</span>[<span class="n">str</span>] = Field(min_length=3, max_length=3)
+    severity: <span class="n">Literal</span>[<span class="s">"low"</span>, <span class="s">"medium"</span>, <span class="s">"high"</span>]
+    related_runbook: <span class="n">str</span> | <span class="n">None</span>
+
+<span class="k">async def</span> <span class="n">triage</span>(alert: Alert) -&gt; Triage | <span class="n">None</span>:
+    ctx = <span class="k">await</span> enrich(alert)            <span class="c"># prom + deploys + runbooks</span>
+    prompt = render(<span class="s">"triage.j2"</span>, alert=alert, ctx=ctx)
+
+    <span class="k">for</span> attempt <span class="k">in</span> range(<span class="n">2</span>):
+        raw = <span class="k">await</span> llm.complete(prompt, response_format=<span class="s">"json"</span>)
+        <span class="k">try</span>:
+            <span class="k">return</span> Triage.model_validate_json(raw)
+        <span class="k">except</span> ValidationError <span class="k">as</span> e:
+            prompt = retry_prompt(prompt, raw, e)
+
+    <span class="k">return</span> <span class="n">None</span>  <span class="c"># caller renders context-only fallback</span></pre>
+        </div>
+
+        <h2 id="outcomes">Outcomes</h2>
+        <ul>
+          <li><strong>Bounded LLM behavior</strong> — strict JSON schema means the system either produces a usable triage object or no triage at all. No half-rendered hallucinations on a pager.</li>
+          <li><strong>Survives alert storms</strong> — async queue absorbs bursts; workers scale horizontally; webhook stays cheap.</li>
+          <li><strong>Graceful degradation</strong> — when the LLM is unreachable or returns garbage, the on-call still gets an enriched message with the metric snapshot and recent deploys.</li>
+        </ul>
+
+        <h2 id="lessons">What I'd Do Differently</h2>
+        <p>Add an <strong>evaluation harness</strong> from week one. The system is only as good as its prompt; without recorded ground-truth alerts and a way to diff prompt changes against them, prompt iteration is vibes. The next iteration replays a corpus of historical alerts on every prompt change.</p>
+
+        <a class="cs-next" href="postgres-ha.html">
+          <div>
+            <div class="lab">Next case study</div>
+            <div class="name">HA PostgreSQL with Patroni</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <aside class="cs-toc">
+        <div class="lab">On this page</div>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#decisions">Key Decisions</a></li>
+          <li><a href="#implementation">Implementation</a></li>
+          <li><a href="#outcomes">Outcomes</a></li>
+          <li><a href="#lessons">What I'd Do Differently</a></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. · 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('topnav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  const tocLinks = document.querySelectorAll('.cs-toc a');
+  const headings = [...document.querySelectorAll('.cs-content h2[id]')];
+  const setActive = () => {
+    let activeId = headings[0]?.id;
+    for (const h of headings) { if (h.getBoundingClientRect().top < 120) activeId = h.id; }
+    tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+</body>
+</html>

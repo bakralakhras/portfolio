@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Real-Time Fraud Detection — Case Study · bakr.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="../Portfolio.html" class="brand">bakr.</a>
+    <div class="nav-links">
+      <a href="../Portfolio.html#projects">Projects</a>
+      <a href="../Portfolio.html#experience">Experience</a>
+      <a href="../Portfolio.html#skills">Skills</a>
+      <a href="../Portfolio.html#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<header class="cs-hero">
+  <div class="wrap">
+    <a class="cs-back" href="../Portfolio.html#case-studies">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to case studies
+    </a>
+    <div class="cs-eyebrow-row">
+      <span class="eyebrow accent">Data Engineering</span>
+      <span class="status amber"><span class="d"></span>In Development</span>
+    </div>
+    <h1 class="cs-title">Real-Time Fraud Detection Platform</h1>
+    <p class="cs-subtitle">A unified streaming + batch fraud analytics platform built on a Kafka-to-Iceberg lakehouse — one storage layer, two access paths, no duplicated data.</p>
+
+    <div class="cs-meta-grid">
+      <div class="cs-meta-cell"><div class="lab">Role</div><div class="val">Infrastructure &amp; System Engineer</div></div>
+      <div class="cs-meta-cell"><div class="lab">Timeline</div><div class="val">[6 months · ongoing]</div></div>
+      <div class="cs-meta-cell"><div class="lab">Stack</div><div class="val">Kafka · Spark · Iceberg</div></div>
+      <div class="cs-meta-cell"><div class="lab">Status</div><div class="val">In Development</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:64px;padding-bottom:96px;">
+  <div class="wrap">
+    <div class="cs-body">
+      <article class="cs-content">
+
+        <h2 id="overview">Overview</h2>
+        <p>Fraud teams need two things from data: <strong>real-time alerts</strong> when a suspicious pattern fires, and <strong>historical analysis</strong> to tune the rules that produced those alerts. Most teams build these as separate pipelines on separate storage. We built one.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Streaming p95</div>
+            <div class="v">[2.4]<span class="unit">s</span></div>
+            <div class="delta down">event → alert</div>
+          </div>
+          <div class="metric">
+            <div class="k">Storage layers</div>
+            <div class="v">1<span class="unit">unified</span></div>
+            <div class="delta">no duplication</div>
+          </div>
+          <div class="metric">
+            <div class="k">Schema evolutions</div>
+            <div class="v">[12]</div>
+            <div class="delta">zero downtime</div>
+          </div>
+        </div>
+
+        <h2 id="problem">The Problem</h2>
+        <p>The legacy setup had a Kafka → custom alerting service for the real-time path, and a separate nightly ETL into a relational warehouse for analysts. Two failure modes followed: <strong>analysts and ML engineers worked on different data</strong> than the rules engine, and storage costs were paid twice for the same events.</p>
+
+        <h2 id="approach">The Approach</h2>
+        <p>Treat Kafka as the ingestion bus and Iceberg-on-MinIO as the single source of truth. Spark Structured Streaming powers the real-time path; the same Iceberg tables are queried by Trino for ad-hoc analytics and Superset dashboards.</p>
+
+        <div class="arch-large">
+          <div class="arch-row">
+            <div class="arch-box">Producers</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">Kafka</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Spark Structured Streaming</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">Alerts topic</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">↓ ingest sink</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box accent">Iceberg tables</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box">MinIO (S3)</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box">Hive Metastore</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Airflow</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Compaction + retention</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">Iceberg snapshots</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Trino</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Superset</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">Analyst dashboards</div>
+          </div>
+        </div>
+
+        <h2 id="decisions">Key Decisions &amp; Tradeoffs</h2>
+
+        <h3>Iceberg over Delta Lake</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Table format</div>
+            <div class="tr-cell"><span class="pick">Apache Iceberg</span><br/>First-class engine support across Spark, Trino, Flink. Rich snapshot model. Catalog-agnostic.</div>
+            <div class="tr-cell"><span class="skip">Delta Lake</span><br/>Strongest in the Spark/Databricks lane; weaker support in Trino at the time of evaluation.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">We needed equal first-class read performance from Trino for analysts and Spark for the streaming engine. Iceberg won on engine parity.</div>
+            <div class="tr-cell">Open table format claims aside, the Trino integration story decided this.</div>
+          </div>
+        </div>
+
+        <h3>Spark over a separate Flink cluster</h3>
+        <p>Flink is the better tool for sub-second streaming with rich state. We dropped it anyway. Operating a second cluster type — a second set of dashboards, runbooks, on-call patterns — wasn't justified by the latency win at our SLO of <strong>p95 &lt; 5s</strong>. Spark Structured Streaming hit it; the team already knew Spark.</p>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">Operational simplicity over latency wins</div>
+            <p class="d">If our SLO required &lt; 1s, Flink would be back on the table. Choose by the SLO, not by the benchmark.</p>
+          </div>
+        </div>
+
+        <h3>Trino for ad-hoc, Spark SQL for batch</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Workload</div><div class="tr-cell">Engine</div><div class="tr-cell">Why</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Analyst queries</div>
+            <div class="tr-cell"><span class="pick">Trino</span></div>
+            <div class="tr-cell">MPP latency profile, JDBC compatibility with Superset, no Spark session warmup tax.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Streaming + heavy batch</div>
+            <div class="tr-cell"><span class="pick">Spark</span></div>
+            <div class="tr-cell">Same engine for streaming and reconciliation jobs keeps the toolchain singular for that path.</div>
+          </div>
+        </div>
+
+        <h2 id="implementation">Implementation Notes</h2>
+
+        <h3>Streaming sink with exactly-once semantics</h3>
+        <div class="snippet">
+          <div class="snippet-head">
+            <span class="fname">jobs/transactions_to_iceberg.py</span>
+            <span class="lang">python</span>
+          </div>
+          <pre><span class="c"># Read from Kafka, evaluate rules, sink raw + alerts to Iceberg</span>
+<span class="n">df</span> = (spark.readStream
+        .format(<span class="s">"kafka"</span>)
+        .option(<span class="s">"subscribe"</span>, <span class="s">"transactions"</span>)
+        .option(<span class="s">"startingOffsets"</span>, <span class="s">"latest"</span>)
+        .load())
+
+<span class="n">events</span> = parse_avro(<span class="n">df</span>.value, <span class="n">schema_registry</span>)
+
+(<span class="n">events</span>.writeStream
+    .format(<span class="s">"iceberg"</span>)
+    .outputMode(<span class="s">"append"</span>)
+    .option(<span class="s">"checkpointLocation"</span>, <span class="s">"s3a://chk/transactions/"</span>)
+    .trigger(processingTime=<span class="s">"30 seconds"</span>)
+    .toTable(<span class="s">"lake.fraud.transactions"</span>))
+
+<span class="n">alerts</span> = apply_rules(<span class="n">events</span>)
+<span class="n">alerts</span>.writeStream.format(<span class="s">"kafka"</span>) \
+    .option(<span class="s">"topic"</span>, <span class="s">"alerts.fraud"</span>) \
+    .option(<span class="s">"checkpointLocation"</span>, <span class="s">"s3a://chk/alerts/"</span>) \
+    .start()</pre>
+        </div>
+
+        <h3>Schema evolution without rewrites</h3>
+        <p>Producers send Avro with Confluent Schema Registry. Iceberg's column-id-based schema means adding nullable fields is a metadata operation; old files are read with default values. We added <strong>12 schema changes</strong> in the first six months without rewriting a single Parquet file.</p>
+
+        <h2 id="timeline">Timeline</h2>
+        <div class="cs-timeline">
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 1</div>
+            <div class="cs-tl-title">Lakehouse foundation</div>
+            <div class="cs-tl-desc">Iceberg + Hive Metastore + MinIO; first end-to-end Spark batch job writing to a managed table.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 2–3</div>
+            <div class="cs-tl-title">Streaming path</div>
+            <div class="cs-tl-desc">Kafka → Spark Structured Streaming → Iceberg sink; checkpointing on MinIO; replay tested.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 4</div>
+            <div class="cs-tl-title">Trino + Superset</div>
+            <div class="cs-tl-desc">Trino over Iceberg connector; Superset dashboards on the same tables the rules engine reads.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 5–6</div>
+            <div class="cs-tl-title">Hardening</div>
+            <div class="cs-tl-desc">Airflow-driven compaction, snapshot expiration, schema evolution playbook, rollback drills.</div>
+          </div>
+        </div>
+
+        <h2 id="outcomes">Outcomes</h2>
+        <ul>
+          <li><strong>Single storage layer</strong> for streaming and analytics — analysts and the rules engine read the same tables, eliminating the "real-time vs. batch numbers don't match" class of bugs.</li>
+          <li><strong>Schema evolution at metadata speed</strong> — additive schema changes are zero-downtime and don't require Parquet rewrites.</li>
+          <li><strong>Replayable</strong> — Iceberg snapshots + Kafka retention let us reprocess historical windows against new rules without breaking live ingestion.</li>
+        </ul>
+
+        <h2 id="lessons">What I'd Do Differently</h2>
+        <p>Compaction was an afterthought. Streaming sinks produce many small files; query performance degraded measurably by month two. <strong>Plan compaction from day one</strong> — Airflow DAGs running <code>rewrite_data_files</code> on a schedule, with snapshot expiration to bound metadata growth.</p>
+
+        <a class="cs-next" href="ai-incident-responder.html">
+          <div>
+            <div class="lab">Next case study</div>
+            <div class="name">AI Incident Responder</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <aside class="cs-toc">
+        <div class="lab">On this page</div>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#decisions">Key Decisions</a></li>
+          <li><a href="#implementation">Implementation</a></li>
+          <li><a href="#timeline">Timeline</a></li>
+          <li><a href="#outcomes">Outcomes</a></li>
+          <li><a href="#lessons">What I'd Do Differently</a></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. · 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('topnav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  const tocLinks = document.querySelectorAll('.cs-toc a');
+  const headings = [...document.querySelectorAll('.cs-content h2[id]')];
+  const setActive = () => {
+    let activeId = headings[0]?.id;
+    for (const h of headings) { if (h.getBoundingClientRect().top < 120) activeId = h.id; }
+    tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+</body>
+</html>

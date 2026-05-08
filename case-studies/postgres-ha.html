@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>HA PostgreSQL with Patroni — Case Study · bakr.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="../Portfolio.html" class="brand">bakr.</a>
+    <div class="nav-links">
+      <a href="../Portfolio.html#projects">Projects</a>
+      <a href="../Portfolio.html#experience">Experience</a>
+      <a href="../Portfolio.html#skills">Skills</a>
+      <a href="../Portfolio.html#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<header class="cs-hero">
+  <div class="wrap">
+    <a class="cs-back" href="../Portfolio.html#case-studies">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to case studies
+    </a>
+    <div class="cs-eyebrow-row">
+      <span class="eyebrow accent">Reliability</span>
+      <span class="status green"><span class="d"></span>Production</span>
+    </div>
+    <h1 class="cs-title">HA PostgreSQL with Patroni</h1>
+    <p class="cs-subtitle">A self-managed, regulator-compliant PostgreSQL cluster that fails over automatically — built on Patroni, etcd, HAProxy, and Keepalived on bare RHEL.</p>
+
+    <div class="cs-meta-grid">
+      <div class="cs-meta-cell"><div class="lab">Role</div><div class="val">Infrastructure &amp; System Engineer</div></div>
+      <div class="cs-meta-cell"><div class="lab">Timeline</div><div class="val">[4 months]</div></div>
+      <div class="cs-meta-cell"><div class="lab">Cluster size</div><div class="val">3 nodes</div></div>
+      <div class="cs-meta-cell"><div class="lab">Status</div><div class="val">Production</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:64px;padding-bottom:96px;">
+  <div class="wrap">
+    <div class="cs-body">
+      <article class="cs-content">
+
+        <h2 id="overview">Overview</h2>
+        <p>The workload was regulated. Data residency requirements ruled out managed PostgreSQL services. The team needed automatic failover, point-in-time recovery, and an operational story that didn't depend on heroics during a 3 AM page.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Failover time</div>
+            <div class="v">~12<span class="unit">s</span></div>
+            <div class="delta down">VIP + Patroni</div>
+          </div>
+          <div class="metric">
+            <div class="k">RPO</div>
+            <div class="v">&lt;1<span class="unit">min</span></div>
+            <div class="delta">WAL → MinIO</div>
+          </div>
+          <div class="metric">
+            <div class="k">PITR drills</div>
+            <div class="v">weekly</div>
+            <div class="delta">automated</div>
+          </div>
+        </div>
+
+        <h2 id="problem">The Problem</h2>
+        <p>Single-node PostgreSQL with cron-based <code>pg_dump</code> backups is fine — until the day it isn't. The previous setup had no failover, recovery was a manual restore from yesterday's dump, and there was no procedure that survived contact with a real outage.</p>
+
+        <h2 id="approach">The Approach</h2>
+        <p>Three RHEL nodes running Patroni-managed PostgreSQL, with etcd providing the consensus layer. HAProxy in front for connection routing; Keepalived for VIP failover at L4. WAL archived continuously to MinIO via <code>pgBackRest</code>, with weekly point-in-time recovery drills validating the backups are usable, not just present.</p>
+
+        <div class="arch-large">
+          <div class="arch-row">
+            <div class="arch-box">App</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">VIP (Keepalived)</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">HAProxy</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">HAProxy queries Patroni REST<br/>for "leader" health checks</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box accent">Patroni leader (pg-01)</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box">Replica (pg-02)</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box">Replica (pg-03)</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">etcd-01</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box accent">etcd quorum</div>
+            <span class="arch-arrow">↔</span>
+            <div class="arch-box">etcd-03</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">WAL archive</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box accent">pgBackRest</div>
+            <span class="arch-arrow">→</span>
+            <div class="arch-box">MinIO (S3)</div>
+          </div>
+        </div>
+
+        <h2 id="decisions">Key Decisions &amp; Tradeoffs</h2>
+
+        <h3>Patroni over repmgr</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Cluster manager</div>
+            <div class="tr-cell"><span class="pick">Patroni + etcd</span><br/>Declarative cluster topology in YAML. Leader election delegated to a real consensus store.</div>
+            <div class="tr-cell"><span class="skip">repmgr</span><br/>Lighter, but failover is more script-ish. Less battle-tested in failure scenarios involving partitioned witnesses.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">When the leader is sick but not dead, Patroni's behavior is predictable because the truth lives in etcd, not in scripts running on the sick node.</div>
+            <div class="tr-cell">repmgr would have worked. Patroni's REST API made HAProxy integration cleaner, which sealed it.</div>
+          </div>
+        </div>
+
+        <h3>etcd over Consul</h3>
+        <p>The platform already ran etcd for other components. Adding Consul would have been a second consensus store with its own ops profile. <strong>One quorum to operate</strong> beat any feature edge Consul offered for this workload.</p>
+
+        <h3>HAProxy + Keepalived over PgBouncer-only</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Layer</div><div class="tr-cell">Tool</div><div class="tr-cell">Why</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">L4 failover (VIP)</div>
+            <div class="tr-cell"><span class="pick">Keepalived</span></div>
+            <div class="tr-cell">Clients reconnect to a stable address; no DNS TTL games during failover.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Leader-aware routing</div>
+            <div class="tr-cell"><span class="pick">HAProxy</span></div>
+            <div class="tr-cell">Health-checks Patroni's REST endpoint. Routes writes to current leader, reads to replicas.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Pooling</div>
+            <div class="tr-cell"><span class="pick">PgBouncer (per app)</span></div>
+            <div class="tr-cell">Application-side pool to dampen connection storms. Not the failover layer.</div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">Backups exist if and only if you've restored them</div>
+            <p class="d">Weekly automated PITR drills against an ephemeral instance. If the drill fails, the cluster is paged — backups are a tier-1 service, not a cron job.</p>
+          </div>
+        </div>
+
+        <h2 id="implementation">Implementation Notes</h2>
+
+        <h3>HAProxy backend with Patroni health checks</h3>
+        <div class="snippet">
+          <div class="snippet-head">
+            <span class="fname">/etc/haproxy/haproxy.cfg</span>
+            <span class="lang">haproxy</span>
+          </div>
+          <pre><span class="k">listen</span> postgres-write
+    <span class="k">bind</span> *:5432
+    <span class="k">option</span> httpchk OPTIONS /leader
+    <span class="k">http-check</span> expect status 200
+    <span class="k">default-server</span> inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+    <span class="k">server</span> pg-01 10.0.0.11:5432 check port 8008
+    <span class="k">server</span> pg-02 10.0.0.12:5432 check port 8008
+    <span class="k">server</span> pg-03 10.0.0.13:5432 check port 8008
+
+<span class="k">listen</span> postgres-read
+    <span class="k">bind</span> *:5433
+    <span class="k">option</span> httpchk OPTIONS /replica
+    <span class="k">http-check</span> expect status 200
+    <span class="k">balance</span> roundrobin
+    <span class="k">server</span> pg-01 10.0.0.11:5432 check port 8008
+    <span class="k">server</span> pg-02 10.0.0.12:5432 check port 8008
+    <span class="k">server</span> pg-03 10.0.0.13:5432 check port 8008</pre>
+        </div>
+
+        <p>Patroni exposes <code>/leader</code> returning 200 only when the node is the elected leader, and <code>/replica</code> returning 200 only on healthy replicas. HAProxy uses these as the source of truth — <strong>no health-check logic lives in scripts</strong>.</p>
+
+        <h2 id="timeline">Timeline</h2>
+        <div class="cs-timeline">
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 1</div>
+            <div class="cs-tl-title">Foundation</div>
+            <div class="cs-tl-desc">3-node etcd cluster, RHEL hardening, PostgreSQL 15 baseline tuning.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 2</div>
+            <div class="cs-tl-title">Patroni rollout</div>
+            <div class="cs-tl-desc">Cluster bootstrap, manual failover drills, REST API exposed for HAProxy.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 3</div>
+            <div class="cs-tl-title">Front-door + backups</div>
+            <div class="cs-tl-desc">HAProxy, Keepalived VIP, pgBackRest to MinIO, first PITR drill.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Month 4</div>
+            <div class="cs-tl-title">Hardening</div>
+            <div class="cs-tl-desc">Chaos drills (kill the leader, partition etcd, fill the disk). Runbook per failure mode.</div>
+          </div>
+        </div>
+
+        <h2 id="outcomes">Outcomes</h2>
+        <ul>
+          <li><strong>Automatic failover</strong> in ~12 seconds — application sees a brief connection blip, no human in the loop required.</li>
+          <li><strong>RPO under 1 minute</strong> via continuous WAL archiving to MinIO with pgBackRest.</li>
+          <li><strong>Tested backups</strong> — weekly automated PITR drills mean a restore is a known-good procedure, not a hope.</li>
+          <li><strong>Read scaling</strong> — replicas serve read-only workloads through the dedicated HAProxy port, taking pressure off the leader.</li>
+        </ul>
+
+        <h2 id="lessons">What I'd Do Differently</h2>
+        <p>Spend more time on the <strong>application reconnect story</strong> earlier. Half of the early "failover incidents" weren't database problems at all — they were application connection pools holding stale connections. Document the recommended client-side timeout and pool-recycle settings, and ship them as defaults to internal services from day one.</p>
+
+        <a class="cs-next" href="sovereign-data-platform.html">
+          <div>
+            <div class="lab">Back to first case study</div>
+            <div class="name">Sovereign Data Platform</div>
+          </div>
+          <span class="arrow">→</span>
+        </a>
+      </article>
+
+      <aside class="cs-toc">
+        <div class="lab">On this page</div>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#decisions">Key Decisions</a></li>
+          <li><a href="#implementation">Implementation</a></li>
+          <li><a href="#timeline">Timeline</a></li>
+          <li><a href="#outcomes">Outcomes</a></li>
+          <li><a href="#lessons">What I'd Do Differently</a></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. · 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('topnav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  const tocLinks = document.querySelectorAll('.cs-toc a');
+  const headings = [...document.querySelectorAll('.cs-content h2[id]')];
+  const setActive = () => {
+    let activeId = headings[0]?.id;
+    for (const h of headings) { if (h.getBoundingClientRect().top < 120) activeId = h.id; }
+    tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+</body>
+</html>

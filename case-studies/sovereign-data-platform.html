@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Sovereign Data Platform &mdash; Case Study &middot; bakr.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="../Portfolio.html" class="brand">bakr.</a>
+    <div class="nav-links">
+      <a href="../Portfolio.html#projects">Projects</a>
+      <a href="../Portfolio.html#experience">Experience</a>
+      <a href="../Portfolio.html#skills">Skills</a>
+      <a href="../Portfolio.html#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<header class="cs-hero">
+  <div class="wrap">
+    <a class="cs-back" href="../Portfolio.html#case-studies">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to case studies
+    </a>
+    <div class="cs-eyebrow-row">
+      <span class="eyebrow accent">Platform Engineering</span>
+      <span class="status green"><span class="d"></span>Production</span>
+    </div>
+    <h1 class="cs-title">Sovereign Data Platform</h1>
+    <p class="cs-subtitle">A GitOps-managed data lakehouse on OpenShift 4.18 &mdash; 10 stateful services, zero static credentials, a single bootstrap command. Built to be operated declaratively with zero configuration drift.</p>
+
+    <div class="cs-meta-grid">
+      <div class="cs-meta-cell"><div class="lab">Role</div><div class="val">Infrastructure &amp; System Engineer</div></div>
+      <div class="cs-meta-cell"><div class="lab">Timeline</div><div class="val">8 months</div></div>
+      <div class="cs-meta-cell"><div class="lab">Team</div><div class="val">3 engineers</div></div>
+      <div class="cs-meta-cell"><div class="lab">Status</div><div class="val">Production</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:64px;padding-bottom:96px;">
+  <div class="wrap">
+    <div class="cs-body">
+      <article class="cs-content">
+
+        <h2 id="overview">Overview</h2>
+        <p>The platform needed to host streaming, batch, and analytical workloads on private infrastructure &mdash; no managed cloud, no escape hatch. Every cross-cutting concern had to be solved in-cluster: secrets lifecycle, certificate rotation, identity, backups, long-term metrics. The constraint that shaped every decision was operational simplicity at scale: a two-engineer on-call rotation had to be able to run this on a Friday night.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Services managed</div>
+            <div class="v">10<span class="unit">components</span></div>
+            <div class="delta">all GitOps-reconciled</div>
+          </div>
+          <div class="metric">
+            <div class="k">Static credentials</div>
+            <div class="v">0</div>
+            <div class="delta down">Vault-issued only</div>
+          </div>
+          <div class="metric">
+            <div class="k">Bootstrap command</div>
+            <div class="v">1<span class="unit">oc apply</span></div>
+            <div class="delta">cold cluster to full platform</div>
+          </div>
+        </div>
+
+        <h2 id="problem">The Problem</h2>
+        <p>The existing approach &mdash; Helm umbrella charts covering the whole platform &mdash; had two failure modes we kept hitting in early rollouts. First, a Trino version bump couldn't ship without staging the entire platform. Second, the moment any engineer touched a cluster directly, we'd accumulate configuration drift that was invisible until something broke.</p>
+        <p>The harder constraint was the infrastructure boundary. This platform sits on private on-premises infrastructure. There are no managed equivalents for secrets management, certificate rotation, or object storage. Every capability the platform needed had to be built and maintained in-cluster, by the same team operating it.</p>
+        <p>I decided early that GitOps wasn't a nice-to-have. It was the only operating model that could survive a two-engineer on-call rotation across 10 stateful services. Everything else followed from that.</p>
+
+        <h2 id="approach">The Approach</h2>
+        <p>ArgoCD with the app-of-apps pattern became the control plane. Each platform component gets its own ArgoCD Application with its own promotion cadence. A parent root app composes them. Vault handles the secret layer &mdash; nothing in Git references a credential except by its Vault path. Adding a new component means one new file in <code>apps/</code> and one new folder in <code>platform/</code>. Nothing else.</p>
+
+        <div class="arch-large">
+          <div class="arch-row">
+            <div class="arch-box">Git: platform-config</div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box accent">ArgoCD root app</div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box">10x component apps</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Kafka (KRaft)</div>
+            <div class="arch-box">Trino + Iceberg</div>
+            <div class="arch-box">Spark Operator</div>
+            <div class="arch-box">NiFi 1.27</div>
+            <div class="arch-box">Airflow</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box">Hive Metastore</div>
+            <div class="arch-box">PostgreSQL</div>
+            <div class="arch-box accent">Vault + VSO</div>
+            <div class="arch-box">Prometheus</div>
+            <div class="arch-box">Thanos</div>
+          </div>
+          <div class="arch-row">
+            <div class="arch-box accent">Vault KV v2</div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box">VSO (AppRole auth)</div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box">K8s Secrets (30s TTL sync)</div>
+            <span class="arch-arrow">&rarr;</span>
+            <div class="arch-box">Pod env / volumes</div>
+          </div>
+        </div>
+
+        <h2 id="decisions">Key Decisions &amp; Tradeoffs</h2>
+
+        <h3>App-of-apps over Helm umbrella</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Composition model</div>
+            <div class="tr-cell"><span class="pick">ArgoCD app-of-apps</span><br>Each component is its own Application, sourced from its own Git path. The root app composes them. Sync waves enforce startup order deterministically.</div>
+            <div class="tr-cell"><span class="skip">Helm umbrella chart</span><br>One release for the entire platform. A single bad <code>values.yaml</code> merge re-renders every sub-chart simultaneously. Blast radius is invisible until it isn't.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">Trino ships on its own schedule without staging Kafka. A cold restore boots in wave order: Vault, cert-manager, storage, data plane, observability. Reproducible from Git alone.</div>
+            <div class="tr-cell">Umbrella charts collapse promotion cadence across unrelated services. Debugging requires unwrapping nested Helm values that don't map cleanly to what's running.</div>
+          </div>
+        </div>
+
+        <h3>Vault Secrets Operator over static secrets</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Secrets lifecycle</div>
+            <div class="tr-cell"><span class="pick">VSO + Vault KV v2 (AppRole)</span><br>VSO reconciles secrets every 30 seconds from Vault paths. AppRole gives explicit, auditable role-based access. Zero hardcoded credentials anywhere in Git or etcd.</div>
+            <div class="tr-cell"><span class="skip">Static Kubernetes Secrets</span><br>Checked into Git, intentionally or accidentally, visible in <code>kubectl get secret</code>, no TTL, no audit trail, no rotation story.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">Rotation is a Vault policy change, not a deployment. Compromised credentials have a hard 30-second blast radius before VSO overwrites them.</div>
+            <div class="tr-cell">We chose AppRole over Kubernetes auth specifically because VSO 1.3.0 dropped token auth. AppRole is explicit; there's no ambient service account identity to misuse.</div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">Trade-off accepted</div>
+            <p class="d">VSO's internal client cache doesn't invalidate when you update the AppRole secret-id in Kubernetes. Discovered this the hard way: updating the secret requires <code>oc rollout restart</code> of the VSO controller manager. Documented in the Phase 7 runbook.</p>
+          </div>
+        </div>
+
+        <h3>Thanos Querier over standalone Prometheus</h3>
+        <p>Rather than deploying a parallel Prometheus stack, I piggybacked on OpenShift's built-in User Workload Monitoring. A custom Grafana instance, managed by Grafana Operator v5, points at the Thanos Querier endpoint at <code>thanos-querier.openshift-monitoring.svc:9091</code>, authenticated via a long-lived ServiceAccount token with <code>cluster-monitoring-view</code>. This gave us cross-namespace metric federation without the operational overhead of managing a second Prometheus lifecycle.</p>
+
+        <h2 id="engineering">Real Engineering Problems</h2>
+        <p>These aren't lessons retrofitted after the fact. These are the actual problems that blocked progress and required root cause analysis to resolve.</p>
+
+        <h3>The ArgoCD CRD chicken-and-egg</h3>
+        <div class="war-story">
+          <div class="ws-label">Incident</div>
+          <p>ArgoCD sync waves don't solve missing CRDs because ArgoCD validates manifests before it applies them. Deploying the Vault Secrets Operator subscription and the VSO CRD-dependent resources in the same sync wave caused validation failures on every sync. The fix was splitting them into two separate ArgoCD Applications: one for the Subscription, which creates the CRDs, and one for the CRD-dependent VaultConnection and VaultAuth resources. Wave ordering across Applications works where wave ordering within a single Application doesn't.</p>
+        </div>
+
+        <h3>The WaitForFirstConsumer deadlock</h3>
+        <div class="war-story">
+          <div class="ws-label">Incident</div>
+          <p>The Helm-installed StorageClass shipped with <code>volumeBindingMode: WaitForFirstConsumer</code>. This is incompatible with local storage: local PVs bind immediately or not at all. The catch is that <code>volumeBindingMode</code> is immutable on a StorageClass. You can't patch it. Full StorageClass deletion and recreation with <code>Immediate</code> binding was the only path forward. Any PVCs already bound to the old class had to be migrated.</p>
+        </div>
+
+        <h3>NiFi 2.x SNI rejection on OpenShift Routes</h3>
+        <div class="war-story">
+          <div class="ws-label">Incident</div>
+          <p>NiFi 2.x runs on Jetty 10, which enforces strict SNI validation against its auto-generated keystore. The keystore has <code>CN=localhost</code>. OpenShift Routes send the actual hostname. SNI mismatch, connection refused. Jetty 9, used by NiFi 1.27.0, doesn't enforce SNI at this level. Downgraded to 1.27.0. NiFi 2.x on OpenShift Routes requires a custom keystore with the route hostname as a SAN.</p>
+        </div>
+
+        <h3>Superset 5.0.0 hardened image has no pip in venv</h3>
+        <div class="war-story">
+          <div class="ws-label">Incident</div>
+          <p>The Superset 5.0.0 hardened image strips pip from its virtualenv. The standard Trino driver install pattern, <code>pip install trino</code> in an init container, fails silently: the package installs but doesn't land where Superset can find it. Workaround: <code>pip install --target=/tmp/pkgs --no-deps</code> combined with <code>PYTHONPATH=/tmp/pkgs</code>. The <code>--no-deps</code> flag is critical because SQLAlchemy 2.0 conflicts with the venv's pinned-compatible version.</p>
+        </div>
+
+        <h3>OpenShift service env injection collision</h3>
+        <div class="war-story">
+          <div class="ws-label">Incident</div>
+          <p>OpenShift automatically injects environment variables for every service in the namespace. For a service named <code>superset</code>, it injects <code>SUPERSET_PORT=tcp://10.96.x.x:8088</code>. Superset's <code>run-server.sh</code> expects <code>SUPERSET_PORT</code> to be a numeric port. The string <code>tcp://...</code> breaks the startup script with a non-obvious error. Fix: explicitly override <code>SUPERSET_PORT=8088</code> in the deployment manifest.</p>
+        </div>
+
+        <h2 id="implementation">Implementation: The Bootstrap</h2>
+        <p>The entire platform deploys from a single command after ArgoCD is installed. The root application points at <code>apps/</code> in the Git repository. Every YAML file in that directory is an ArgoCD Application for one platform component. ArgoCD discovers and reconciles them automatically.</p>
+
+        <div class="snippet">
+          <div class="snippet-head">
+            <span class="fname">apps/root.yaml</span>
+            <span class="lang">yaml</span>
+          </div>
+          <pre><span class="k">apiVersion</span>: argoproj.io/v1alpha1
+<span class="k">kind</span>: Application
+<span class="k">metadata</span>:
+  <span class="k">name</span>: <span class="s">platform-root</span>
+  <span class="k">namespace</span>: <span class="s">openshift-gitops</span>
+<span class="k">spec</span>:
+  <span class="k">project</span>: <span class="s">platform</span>
+  <span class="k">source</span>:
+    <span class="k">repoURL</span>: <span class="s">https://github.com/bakralakhras/OpenShift-ArgoCD.git</span>
+    <span class="k">path</span>: <span class="s">apps/</span>           <span class="c"># every yaml here becomes a component app</span>
+    <span class="k">targetRevision</span>: <span class="s">main</span>
+  <span class="k">destination</span>:
+    <span class="k">server</span>: <span class="s">https://kubernetes.default.svc</span>
+    <span class="k">namespace</span>: <span class="s">openshift-gitops</span>
+  <span class="k">syncPolicy</span>:
+    <span class="k">automated</span>: { <span class="k">prune</span>: <span class="n">true</span>, <span class="k">selfHeal</span>: <span class="n">true</span> }
+    <span class="k">syncOptions</span>: [<span class="s">CreateNamespace=true</span>, <span class="s">ApplyOutOfSyncOnly=true</span>]</pre>
+        </div>
+
+        <p>Sync waves handle cold-start ordering. Vault must be healthy before cert-manager runs. Storage must be ready before data services boot. A failed wave blocks everything downstream, which is exactly the right behavior for a platform with hard dependency ordering.</p>
+
+        <h2 id="timeline">Build Sequence</h2>
+        <div class="cs-timeline">
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 1-2</div>
+            <div class="cs-tl-title">GitOps foundation + object storage</div>
+            <div class="cs-tl-desc">ArgoCD app-of-apps bootstrap, namespace governance. MinIO on Local Storage Operator with block devices from raw worker disks. <code>WaitForFirstConsumer</code> deadlock hit and resolved here.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 3-4</div>
+            <div class="cs-tl-title">Lakehouse core + streaming</div>
+            <div class="cs-tl-desc">PostgreSQL to Hive Metastore to Trino querying Iceberg tables on MinIO. Kafka KRaft, 3-broker and no ZooKeeper, plus Kafka Connect with a custom S3 Sink build for stream-to-lake materialization.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 5</div>
+            <div class="cs-tl-title">Ingestion (NiFi)</div>
+            <div class="cs-tl-desc">NiFi 1.27.0 with passthrough TLS route, single-user auth, NFS-backed state. SNI rejection on NiFi 2.x resolved by downgrade here.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 6-7</div>
+            <div class="cs-tl-title">Observability + security</div>
+            <div class="cs-tl-desc">Grafana Operator on UWM Thanos Querier. Vault + VSO with AppRole auth. CRD chicken-and-egg and VSO cache invalidation problems resolved here.</div>
+          </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 8-9</div>
+            <div class="cs-tl-title">Visualization + documentation</div>
+            <div class="cs-tl-desc">Superset 5.0.0 connected to Trino. Runtime driver injection pattern for hardened image. Per-phase runbooks written as cold-start guides.</div>
+          </div>
+        </div>
+
+        <h2 id="outcomes">Outcomes</h2>
+        <ul>
+          <li><strong>Zero static credentials</strong> across the entire platform. Every secret is materialized by VSO from a Vault KV v2 path, reconciled every 30 seconds.</li>
+          <li><strong>Independent component release cadence.</strong> Trino, Kafka, and Airflow each ship on their own schedule. The root app composes the platform; it doesn't gate it.</li>
+          <li><strong>Cold restore from Git alone.</strong> A fresh OpenShift cluster plus one <code>oc apply</code> reproduces the entire platform in wave order. No tribal knowledge required.</li>
+          <li><strong>Two-engineer on-call.</strong> Per-phase runbooks cover every component. Sync-wave bootstrap makes a cold restore predictable and sequenced.</li>
+          <li><strong>Nine production incidents documented.</strong> Every failure captured with symptom, root cause, and fix, available in the phase runbooks in the repository.</li>
+        </ul>
+
+        <h2 id="retrospective">What I'd Do Differently</h2>
+        <p>The policy layer should have been day one. I rolled Kyverno retroactively to enforce things like "no hardcoded <code>imagePullSecrets</code>" and "every namespace requires a NetworkPolicy." Three production-bound misconfigurations during early rollouts would have been caught at admission time if the guardrails were there from the start. Kyverno is cheap to run; the cost of retrofitting policies onto a running platform is not.</p>
+        <p>The other miss was treating Vault as infrastructure rather than a service. Early on, a Raft leader election storm masked itself as a Kafka client issue for nearly an hour. We now alert on Vault leader transitions, seal status, and policy denial rate as first-class signals, the same way we alert on Kafka consumer lag or Trino query failures. If your platform boots through Vault, Vault needs to be in your top-five observability concerns from day one.</p>
+
+        <a class="cs-next" href="monitoring-stack.html">
+          <div>
+            <div class="lab">Next case study</div>
+            <div class="name">Distributed NiFi Monitoring Stack</div>
+          </div>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </article>
+
+      <aside class="cs-toc">
+        <div class="lab">On this page</div>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#problem">The Problem</a></li>
+          <li><a href="#approach">The Approach</a></li>
+          <li><a href="#decisions">Key Decisions</a></li>
+          <li><a href="#engineering">War Stories</a></li>
+          <li><a href="#implementation">Bootstrap</a></li>
+          <li><a href="#timeline">Build Sequence</a></li>
+          <li><a href="#outcomes">Outcomes</a></li>
+          <li><a href="#retrospective">Retrospective</a></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. &middot; 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('topnav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const tocLinks = document.querySelectorAll('.cs-toc a');
+  const headings = [...document.querySelectorAll('.cs-content h2[id]')];
+  const setActive = () => {
+    let activeId = headings[0]?.id;
+    for (const h of headings) {
+      if (h.getBoundingClientRect().top < 120) activeId = h.id;
+    }
+    tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+
+</body>
+</html>

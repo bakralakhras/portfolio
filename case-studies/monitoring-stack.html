@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Distributed NiFi Monitoring Stack &mdash; Case Study &middot; bakr.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+
+<nav class="top" id="topnav">
+  <div class="wrap">
+    <a href="../Portfolio.html" class="brand">bakr.</a>
+    <div class="nav-links">
+      <a href="../Portfolio.html#projects">Projects</a>
+      <a href="../Portfolio.html#experience">Experience</a>
+      <a href="../Portfolio.html#skills">Skills</a>
+      <a href="../Portfolio.html#contact">Contact</a>
+      <span class="pill-otw"><span class="dot"></span>Open to work</span>
+    </div>
+  </div>
+</nav>
+
+<header class="cs-hero">
+  <div class="wrap">
+    <a class="cs-back" href="../Portfolio.html#case-studies">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to case studies
+    </a>
+    <div class="cs-eyebrow-row">
+      <span class="eyebrow accent">Observability Engineering</span>
+      <span class="status green"><span class="d"></span>Completed</span>
+    </div>
+    <h1 class="cs-title">Distributed NiFi Monitoring Stack</h1>
+    <p class="cs-subtitle">Full-stack observability across 20 geographically distributed sites: 60 NiFi nodes, 120 scrape targets, no single point of failure, and one URL for the client. Every architectural decision was forced by a constraint the previous one exposed.</p>
+
+    <div class="cs-meta-grid">
+      <div class="cs-meta-cell"><div class="lab">Role</div><div class="val">Infrastructure &amp; System Engineer</div></div>
+      <div class="cs-meta-cell"><div class="lab">Sites</div><div class="val">20 cities</div></div>
+      <div class="cs-meta-cell"><div class="lab">NiFi nodes</div><div class="val">60 instances</div></div>
+      <div class="cs-meta-cell"><div class="lab">Status</div><div class="val">Completed</div></div>
+    </div>
+  </div>
+</header>
+
+<section style="padding-top:64px;padding-bottom:96px;">
+  <div class="wrap">
+    <div class="cs-body">
+      <article class="cs-content">
+
+        <h2 id="overview">Overview</h2>
+        <p>The requirement was straightforward on paper: build observability for a distributed NiFi deployment spanning 20 sites across multiple cities, each running a 3-node NiFi cluster. Two things had to be monitored per node: the NiFi flow metrics via the API on port 8443, and the underlying server via node exporter. The client wanted a single dashboard URL, with no infrastructure complexity exposed to them.</p>
+        <p>What looked like a monitoring project became a storage architecture problem, a vendor licensing problem, and an HA design problem, in that order. Each decision revealed the next constraint.</p>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">Scrape targets</div>
+            <div class="v">120<span class="unit">endpoints</span></div>
+            <div class="delta">60 NiFi API + 60 node exporter</div>
+          </div>
+          <div class="metric">
+            <div class="k">Single points of failure</div>
+            <div class="v">0</div>
+            <div class="delta">full HA at every layer</div>
+          </div>
+          <div class="metric">
+            <div class="k">Client endpoints</div>
+            <div class="v">1<span class="unit">VIP</span></div>
+            <div class="delta">Keepalived in front of Grafana</div>
+          </div>
+        </div>
+
+        <h2 id="scale">The Scale</h2>
+        <div class="scale-grid">
+          <div class="scale-cell">
+            <div class="sk">Sites</div>
+            <div class="sv">20</div>
+            <div class="sd">Geographically distributed across multiple cities</div>
+          </div>
+          <div class="scale-cell">
+            <div class="sk">NiFi nodes per site</div>
+            <div class="sv">3</div>
+            <div class="sd">3-node cluster per site, built and configured as part of this project</div>
+          </div>
+          <div class="scale-cell">
+            <div class="sk">Scrape targets</div>
+            <div class="sv">120</div>
+            <div class="sd">NiFi API :8443 + node exporter per node</div>
+          </div>
+          <div class="scale-cell">
+            <div class="sk">HQ components</div>
+            <div class="sv">10</div>
+            <div class="sd">Two each: Prometheus, Thanos, Grafana, SeaweedFS, and NFS</div>
+          </div>
+        </div>
+
+        <h2 id="chain">The Decision Chain</h2>
+        <p>This stack wasn't designed top-down. It was built decision by decision, each one exposing the next problem. This is the actual sequence.</p>
+
+        <div class="chain">
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num hit">1</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-decision">Decision</span>
+              <div class="chain-title">Prometheus to scrape NiFi API and node exporter</div>
+              <div class="chain-desc">The target was clear: scrape NiFi's API metrics on port 8443 for processor stats, connection queue depth, flow throughput, and node exporter on each VM for server-level visibility. Prometheus was the obvious starting point.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num dead">2</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-constraint">Constraint</span>
+              <div class="chain-title">One Prometheus instance is a single point of failure</div>
+              <div class="chain-desc">120 scrape targets across 20 cities through a single Prometheus instance was operationally unacceptable. If that instance went down, monitoring for the entire deployment went blind. Two Prometheus instances were needed for HA.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num hit">3</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-decision">Decision</span>
+              <div class="chain-title">Two Prometheus instances in agent mode</div>
+              <div class="chain-desc">Both scrape the same 120 targets and forward metrics upstream via remote write. Agent mode removes local storage from Prometheus entirely, turning it into a stateless scrape-and-forward process instead of a stateful database.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num dead">4</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-constraint">Constraint</span>
+              <div class="chain-title">Two Prometheus instances produce duplicate metrics</div>
+              <div class="chain-desc">Both agents scrape the same targets and forward identical time series. Without deduplication, every downstream query appears twice, dashboards show doubled values, alerts fire twice, and aggregations are wrong.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num hit">5</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-decision">Decision</span>
+              <div class="chain-title">Thanos for deduplication and long-term storage</div>
+              <div class="chain-desc">Thanos Receive ingests the remote write streams from both Prometheus agents. Thanos Querier deduplicates at query time using the <code>replica</code> label. Two Thanos Receive instances provide HA, with Keepalived exposing a VIP for the write endpoint.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num dead">6</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-constraint">Constraint</span>
+              <div class="chain-title">Thanos needs object storage, and MinIO was the default assumption</div>
+              <div class="chain-desc">Thanos ships blocks to an S3-compatible object store for long-term retention. The available storage infrastructure was NFS. MinIO and NFS are incompatible because MinIO requires direct I/O semantics that NFS cannot reliably provide.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num dead">7</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-constraint">Constraint</span>
+              <div class="chain-title">MinIO Community Edition was a long-term fit risk</div>
+              <div class="chain-desc">Even setting aside the NFS incompatibility, the client required fully open-source software. MinIO Enterprise was not an option, and relying on CE was not acceptable for a production deployment under those constraints.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num hit">8</div><div class="chain-connector"></div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-resolved">Resolved</span>
+              <div class="chain-title">SeaweedFS as the object store backend</div>
+              <div class="chain-desc">SeaweedFS is S3-compatible, open-source, and designed to work on top of NFS storage. Two SeaweedFS nodes running on two NFS storage servers provide HA at the object store layer. Thanos treats it as a standard S3 endpoint.</div>
+            </div>
+          </div>
+          <div class="chain-step">
+            <div class="chain-line"><div class="chain-num hit">9</div></div>
+            <div class="chain-body">
+              <span class="chain-tag tag-resolved">Resolved</span>
+              <div class="chain-title">Keepalived VIP in front of Grafana for a single client endpoint</div>
+              <div class="chain-desc">Two Grafana instances run active/passive behind a Keepalived VIP. The client gets one URL. If the active Grafana node fails, Keepalived promotes the standby and the VIP moves. The same pattern fronts Thanos Receive for the Prometheus agent write endpoint.</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 id="architecture">Final Architecture</h2>
+        <div class="arch-large arch-sections">
+          <div class="arch-section">
+            <div class="arch-section-label">Edge: 20 sites x 3 nodes</div>
+            <div class="arch-row">
+              <div class="arch-box orange">NiFi API :8443</div>
+              <div class="arch-box">Node Exporter :9100</div>
+              <span class="arch-arrow">&larr; scraped by &rarr;</span>
+              <div class="arch-box blue">Prom Agent x2</div>
+              <span class="arch-arrow">remote_write &rarr;</span>
+              <div class="arch-box vip">VIP (Keepalived)</div>
+            </div>
+          </div>
+          <div class="arch-section">
+            <div class="arch-section-label">HQ: central ingestion and storage</div>
+            <div class="arch-row">
+              <div class="arch-box vip">VIP to Thanos Receive</div>
+              <div class="arch-box accent">Thanos Receive x2</div>
+              <span class="arch-arrow">&rarr; blocks &rarr;</span>
+              <div class="arch-box">SeaweedFS x2</div>
+              <span class="arch-arrow">on top of</span>
+              <div class="arch-box">NFS x2</div>
+            </div>
+            <div class="arch-row">
+              <div class="arch-box accent">Thanos Querier</div>
+              <span class="arch-arrow">deduplicates &rarr;</span>
+              <div class="arch-box blue">Grafana x2</div>
+              <span class="arch-arrow">behind &rarr;</span>
+              <div class="arch-box vip">VIP to client</div>
+            </div>
+          </div>
+          <div class="arch-section">
+            <div class="arch-section-label">What the client sees</div>
+            <div class="arch-row">
+              <div class="arch-box vip">1 URL · 1 dashboard · 0 complexity</div>
+            </div>
+          </div>
+        </div>
+
+        <h2 id="decisions">Key Decisions &amp; Tradeoffs</h2>
+
+        <h3>Prometheus agent mode over standard Prometheus</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Scraping model</div>
+            <div class="tr-cell"><span class="pick">Prometheus agent mode</span><br>Stateless scrape-and-forward. No local TSDB. Both agents scrape all 120 targets and remote_write to the Thanos VIP. Deduplication happens at query time in Thanos Querier.</div>
+            <div class="tr-cell"><span class="skip">Standard Prometheus + load balancer</span><br>Requires managing local storage per Prometheus instance. A load balancer can split scrape targets unpredictably, so partial failure creates partial blind spots with no clear ownership.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">Agent mode makes Prometheus operationally simple. No disk management, TSDB compaction, or retention tuning. If an agent dies, the other still has complete coverage.</div>
+            <div class="tr-cell">A load balancer approach solves one HA problem but creates a split coverage problem. Agent mode with full duplication avoids this entirely.</div>
+          </div>
+        </div>
+
+        <h3>Keepalived VIP over load balancer</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">HA mechanism</div>
+            <div class="tr-cell"><span class="pick">Keepalived + VIP</span><br>A virtual IP floats between active and standby nodes. Used in front of both Thanos Receive for Prometheus writes and Grafana for client access. No external dependency.</div>
+            <div class="tr-cell"><span class="skip">External load balancer</span><br>Introduces another infrastructure component to manage and monitor. In an environment where the client controls the hardware and wants minimal moving parts, this was overhead without proportional benefit.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">Keepalived gives deterministic failover: the VIP moves to the standby within seconds of a VRRP heartbeat failure. For Grafana, the client never learns there are two nodes.</div>
+            <div class="tr-cell">At two-node HA, a load balancer adds latency, complexity, and a potential single point of failure unless it is also made redundant.</div>
+          </div>
+        </div>
+
+        <h3>SeaweedFS over MinIO</h3>
+        <div class="tradeoff">
+          <div class="tr-row head"><div class="tr-cell">Decision</div><div class="tr-cell">Chosen</div><div class="tr-cell">Rejected</div></div>
+          <div class="tr-row">
+            <div class="tr-cell">Object store</div>
+            <div class="tr-cell"><span class="pick">SeaweedFS on NFS</span><br>S3-compatible, fully open-source, and designed to run on top of NFS. Two nodes for HA. Thanos configuration unchanged because it sees a standard S3 endpoint.</div>
+            <div class="tr-cell"><span class="skip">MinIO CE</span><br>Incompatible with NFS storage backends. CE roadmap created a long-term fit risk, while Enterprise conflicted with the open-source requirement.</div>
+          </div>
+          <div class="tr-row">
+            <div class="tr-cell">Why it matters</div>
+            <div class="tr-cell">SeaweedFS was the S3-compatible open-source solution that fit the available NFS storage layer and kept the object store abstraction clean for Thanos.</div>
+            <div class="tr-cell">MinIO on NFS can corrupt data under concurrent writes. This is a fundamental incompatibility between MinIO's I/O model and NFS semantics, not a tuning issue.</div>
+          </div>
+        </div>
+
+        <h2 id="scraping">Scraping NiFi</h2>
+        <p>Each NiFi node exposes two metric sources. The NiFi API on port 8443 provides flow-level observability: processor execution counts, connection queue depth and byte count, back-pressure events, and bulletin board errors. Node exporter on each VM provides the server layer: CPU, memory, disk I/O, and network throughput.</p>
+        <p>The NiFi API requires authentication. Prometheus scrapes it with a bearer token configured per job in the scrape config. The TLS endpoint uses NiFi's internal keystore, so the Prometheus job initially used <code>insecure_skip_verify: true</code>, with CA validation tracked as a certificate-hardening follow-up.</p>
+
+        <div class="snippet">
+          <div class="snippet-head">
+            <span class="fname">prometheus-agent.yml</span>
+            <span class="lang">yaml</span>
+          </div>
+          <pre><span class="k">scrape_configs</span>:
+  - <span class="k">job_name</span>: <span class="s">nifi-api</span>
+    <span class="k">scheme</span>: <span class="s">https</span>
+    <span class="k">tls_config</span>:
+      <span class="k">insecure_skip_verify</span>: <span class="n">true</span>   <span class="c"># replace with ca_file during cert hardening</span>
+    <span class="k">authorization</span>:
+      <span class="k">credentials_file</span>: <span class="s">/etc/prometheus/nifi-token</span>
+    <span class="k">static_configs</span>:
+      - <span class="k">targets</span>:
+          <span class="c"># site-01</span>
+          - <span class="s">site01-nifi-1:8443</span>
+          - <span class="s">site01-nifi-2:8443</span>
+          - <span class="s">site01-nifi-3:8443</span>
+          <span class="c"># ... 17 more sites</span>
+    <span class="k">relabel_configs</span>:
+      - <span class="k">source_labels</span>: [__address__]
+        <span class="k">regex</span>: <span class="s">(site\d+)-.*</span>
+        <span class="k">target_label</span>: <span class="s">site</span>
+        <span class="k">replacement</span>: <span class="s">${1}</span>
+
+  - <span class="k">job_name</span>: <span class="s">node-exporter</span>
+    <span class="k">static_configs</span>:
+      - <span class="k">targets</span>:
+          - <span class="s">site01-nifi-1:9100</span>
+          - <span class="s">site01-nifi-2:9100</span>
+          - <span class="s">site01-nifi-3:9100</span>
+          <span class="c"># ... 17 more sites</span>
+
+<span class="k">remote_write</span>:
+  - <span class="k">url</span>: <span class="s">http://&lt;thanos-vip&gt;:19291/api/v1/receive</span>
+    <span class="k">headers</span>:
+      <span class="k">THANOS-TENANT</span>: <span class="s">nifi-platform</span></pre>
+        </div>
+
+        <p>The <code>site</code> label injected via relabeling powers the per-site Grafana dashboards. Every metric carries the site it came from, so a single dashboard template can filter by site using a variable.</p>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">Deduplication label</div>
+            <p class="d">Both Prometheus agents add a <code>replica</code> label, such as <code>prom-1</code> or <code>prom-2</code>, before remote_write. Thanos Querier is configured with <code>--query.replica-label=replica</code>. At query time, Thanos picks one replica and discards the other.</p>
+          </div>
+        </div>
+
+        <h2 id="dashboards">Grafana Dashboards</h2>
+        <p>There are two dashboard layers. Site dashboards give operators a geographic overview: which sites are healthy, which NiFi nodes have elevated queue depth or back-pressure, and which servers are under resource pressure. The site variable is a Grafana template variable populated from the <code>site</code> label.</p>
+        <p>Flow dashboards drill into a specific NiFi cluster: individual processor throughput, connection queue depth over time, processor errors, and bulletin events. These are the dashboards an operator uses when a site-level alert fires and they need to identify which flow or processor is the cause.</p>
+
+        <h2 id="retrospective">What I'd Do Differently</h2>
+        <p>The <code>insecure_skip_verify</code> on NiFi TLS should have been resolved earlier in the build. The NiFi internal keystore CN doesn't match the hostnames Prometheus scrapes, so proper CA validation requires either importing NiFi's self-signed CA into Prometheus or replacing NiFi's keystore with certs signed by a trusted CA. The gap is documented as a certificate-hardening item.</p>
+        <p>The site-label relabeling approach scales to 20 sites cleanly, but if this deployment grows significantly, static scrape configs become a maintenance burden. The long-term answer is service discovery: either file-based SD populated by configuration management or DNS-based SD if the site hostnames follow a stable pattern. For 20 sites, static configs are fine. For 50+, they become a problem.</p>
+
+        <a class="cs-next" href="sovereign-data-platform.html">
+          <div>
+            <div class="lab">Previous case study</div>
+            <div class="name">Sovereign Data Platform</div>
+          </div>
+          <span class="arrow">&rarr;</span>
+        </a>
+      </article>
+
+      <aside class="cs-toc">
+        <div class="lab">On this page</div>
+        <ol>
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#scale">The Scale</a></li>
+          <li><a href="#chain">Decision Chain</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#decisions">Key Decisions</a></li>
+          <li><a href="#scraping">Scraping NiFi</a></li>
+          <li><a href="#dashboards">Dashboards</a></li>
+          <li><a href="#retrospective">Retrospective</a></li>
+        </ol>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="l">bakr. &middot; 2025</div>
+    <div class="r">
+      <a class="ilink" href="https://github.com/bakralakhras" target="_blank" rel="noopener noreferrer" title="GitHub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></a>
+      <a class="ilink" href="https://www.linkedin.com/in/bakr-alakhras/" target="_blank" rel="noopener noreferrer" title="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2zM4 4a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg></a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const nav = document.getElementById('topnav');
+  const onScroll = () => { nav.classList.toggle('scrolled', window.scrollY > 8); };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  const tocLinks = document.querySelectorAll('.cs-toc a');
+  const headings = [...document.querySelectorAll('.cs-content h2[id]')];
+  const setActive = () => {
+    let activeId = headings[0]?.id;
+    for (const h of headings) {
+      if (h.getBoundingClientRect().top < 120) activeId = h.id;
+    }
+    tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + activeId));
+  };
+  window.addEventListener('scroll', setActive, { passive: true });
+  setActive();
+</script>
+
+</body>
+</html>
