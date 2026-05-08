@@ -2,6 +2,14 @@
 
 Most repeatable homepage content now lives in `assets/js/data.js`. The HTML contains only section mount points, and `assets/js/renderers.js` turns the data into cards, timelines, and badges.
 
+After editing `assets/js/data.js`, run:
+
+```powershell
+node generate.js
+```
+
+This pre-renders the homepage content into `index.html` so the site remains crawlable and readable without JavaScript. The runtime JavaScript still enhances the page when available, but it no longer replaces existing static content.
+
 ## Add a Project
 
 Add a new object to `portfolioData.projects` in `assets/js/data.js`.

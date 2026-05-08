@@ -112,6 +112,14 @@ Additional editing notes are in:
 CONTENT.md
 ```
 
+After updating `assets/js/data.js`, regenerate the static homepage markup:
+
+```powershell
+node generate.js
+```
+
+This keeps `index.html` crawlable and readable without JavaScript while preserving the existing JavaScript as progressive enhancement.
+
 ## Design Direction
 
 The visual direction is dark, technical, and systems-oriented:

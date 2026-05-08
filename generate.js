@@ -1,5 +1,23 @@
-import { portfolioData } from './data.js';
-import { iconPaths } from './icons.js';
+const fs = require('fs');
+const path = require('path');
+
+const root = __dirname;
+
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
+const write = (file, content) => fs.writeFileSync(path.join(root, file), content);
+
+const loadExportedConst = (file, name) => {
+  const source = read(file);
+  const marker = `export const ${name} =`;
+  const start = source.indexOf(marker);
+  if (start === -1) throw new Error(`Could not find ${marker} in ${file}`);
+
+  const expression = source.slice(start + marker.length).trim().replace(/;\s*$/, '');
+  return Function(`"use strict"; return (${expression});`)();
+};
+
+const portfolioData = loadExportedConst('assets/js/data.js', 'portfolioData');
+const iconPaths = loadExportedConst('assets/js/icons.js', 'iconPaths');
 
 const escapeHtml = (value) => String(value)
   .replaceAll('&', '&amp;')
@@ -56,7 +74,7 @@ const renderArchRow = (row) => `
   <div class="arch-row">
     ${row.map((item, index) => {
       const box = typeof item === 'string' ? { text: item } : item;
-      const arrow = index > 0 ? '<span class="arch-arrow">→</span>' : '';
+      const arrow = index > 0 ? '<span class="arch-arrow">&rarr;</span>' : '';
       return `${arrow}<div class="arch-box ${box.accent ? 'accent' : ''}">${escapeHtml(box.text)}</div>`;
     }).join('')}
   </div>`;
@@ -81,7 +99,7 @@ const renderCaseStudy = (study) => `
     </div>
     <div class="cs-foot">
       <div class="tstack">${badges(study.stack)}</div>
-      <a class="cs-link" href="${escapeHtml(study.href)}">Read Case Study →</a>
+      <a class="cs-link" href="${escapeHtml(study.href)}">Read Case Study &rarr;</a>
     </div>
   </article>`;
 
@@ -102,7 +120,7 @@ const renderSkillGroup = (group) => `
   </div>`;
 
 const renderEducation = (education) => `
-  <div class="deg">${escapeHtml(education.degree)} — <span>${escapeHtml(education.school)}</span></div>
+  <div class="deg">${escapeHtml(education.degree)} &mdash; <span>${escapeHtml(education.school)}</span></div>
   <div class="meta">${escapeHtml(education.meta)}</div>`;
 
 const renderCertification = (cert) => `
@@ -117,21 +135,53 @@ const renderCertification = (cert) => `
     </div>
   </div>`;
 
-export const renderPortfolioData = () => {
-  const renderIfEmpty = (id, html) => {
-    const mount = document.getElementById(id);
-    if (!mount || mount.children.length > 0) return;
-    mount.innerHTML = html;
-  };
-
-  renderIfEmpty('filters', portfolioData.categories
+const sections = {
+  filters: portfolioData.categories
     .map((category, index) => `<button class="pill ${index === 0 ? 'active' : ''}" data-cat="${escapeHtml(category.id)}">${escapeHtml(category.label)}</button>`)
-    .join(''));
-  renderIfEmpty('featured-projects', portfolioData.projects.filter(project => project.featured).map(renderProject).join(''));
-  renderIfEmpty('notable-projects', portfolioData.projects.filter(project => !project.featured).map(renderProject).join(''));
-  renderIfEmpty('case-study-grid', portfolioData.caseStudies.map(renderCaseStudy).join(''));
-  renderIfEmpty('skills-grid', portfolioData.skills.map(renderSkillGroup).join(''));
-  renderIfEmpty('experience-timeline', portfolioData.experience.map(renderExperience).join(''));
-  renderIfEmpty('education-block', renderEducation(portfolioData.education));
-  renderIfEmpty('certification-grid', portfolioData.certifications.map(renderCertification).join(''));
+    .join(''),
+  'featured-projects': portfolioData.projects.filter(project => project.featured).map(renderProject).join(''),
+  'notable-projects': portfolioData.projects.filter(project => !project.featured).map(renderProject).join(''),
+  'case-study-grid': portfolioData.caseStudies.map(renderCaseStudy).join(''),
+  'skills-grid': portfolioData.skills.map(renderSkillGroup).join(''),
+  'experience-timeline': portfolioData.experience.map(renderExperience).join(''),
+  'education-block': renderEducation(portfolioData.education),
+  'certification-grid': portfolioData.certifications.map(renderCertification).join(''),
 };
+
+const replaceMount = (html, id, content) => {
+  const openPattern = new RegExp(`<div\\b[^>]*\\bid="${id}"[^>]*>`, 'm');
+  const openMatch = openPattern.exec(html);
+  if (!openMatch) throw new Error(`Could not find mount #${id}`);
+
+  const openStart = openMatch.index;
+  const openEnd = openStart + openMatch[0].length;
+  const tagPattern = /<\/?div\b[^>]*>/g;
+  tagPattern.lastIndex = openEnd;
+
+  let depth = 1;
+  let closeStart = -1;
+  let closeEnd = -1;
+  let tagMatch;
+  while ((tagMatch = tagPattern.exec(html))) {
+    if (tagMatch[0].startsWith('</')) depth -= 1;
+    else depth += 1;
+
+    if (depth === 0) {
+      closeStart = tagMatch.index;
+      closeEnd = tagPattern.lastIndex;
+      break;
+    }
+  }
+
+  if (closeStart === -1) throw new Error(`Could not find closing tag for #${id}`);
+
+  return `${html.slice(0, openEnd)}\n${content}\n    ${html.slice(closeStart, closeEnd)}${html.slice(closeEnd)}`;
+};
+
+let html = read('index.html');
+for (const [id, content] of Object.entries(sections)) {
+  html = replaceMount(html, id, content);
+}
+
+write('index.html', html);
+console.log(`Generated static homepage content for ${Object.keys(sections).length} sections.`);
