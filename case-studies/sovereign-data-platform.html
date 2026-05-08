@@ -245,6 +245,58 @@
             <div class="cs-tl-title">Visualization + documentation</div>
             <div class="cs-tl-desc">Superset 5.0.0 connected to Trino. Runtime driver injection pattern for hardened image. Per-phase runbooks written as cold-start guides.</div>
           </div>
+          <div class="cs-tl-item">
+            <div class="cs-tl-when">Phase 10</div>
+            <div class="cs-tl-title">Cluster scaling + Rook-Ceph storage</div>
+            <div class="cs-tl-desc">Scaled from 2 to 5 workers to support real data workloads. Migrated stateful storage off NFS onto Rook-Ceph block and filesystem storage.</div>
+          </div>
+        </div>
+
+        <h2 id="phase2">Phase 2: Scaling &amp; Storage</h2>
+        <p>Phase 1 shipped the platform. Phase 2 was about making it actually run data workloads at a scale that exposed the infrastructure limits.</p>
+
+        <h3>The resource problem</h3>
+        <p>The original cluster, 3 masters and 2 workers, was enough to bootstrap and validate every platform component. The moment I started running real pipelines with Kafka, Spark, Trino, and Airflow simultaneously, the workers ran out of headroom. Pods were pending, schedulers were rejecting placements, and the platform was operational in name only. I scaled to 5 workers. The new nodes joined the cluster and the scheduling pressure resolved.</p>
+
+        <h3>The storage problem</h3>
+        <p>With more workers came the real problem: the platform's stateful workloads, including Kafka brokers, PostgreSQL, Schema Registry, and NiFi, were all backed by NFS. NFS works for low-throughput workloads and shared filesystems, but it's the wrong backend for databases and message brokers that need consistent block I/O. The platform needed proper block storage.</p>
+        <p>The natural answer in the Red Hat ecosystem is OpenShift Data Foundation. I tried it. ODF has hard infrastructure requirements: minimum 3 dedicated storage nodes, specific CPU and memory thresholds per node, and raw block devices that aren't already in use by the OS or other workloads. My workers are 4-core, 16GB VMs with a single OS disk; worker5 only has 8GB RAM. ODF rejected the cluster. Not a configuration problem, a requirements problem. ODF simply needs more than what these nodes offer.</p>
+
+        <h3>The Rook-Ceph decision</h3>
+        <p>Rook-Ceph is what ODF is built on. The difference is that Rook-Ceph doesn't enforce ODF's minimum requirements: it lets you define your own pool configuration against whatever hardware you have. The workers had secondary disks of varying sizes: 34GB on worker3, 50GB on worker2, and 150GB on worker4. Rook-Ceph pools all three into a single Ceph cluster, handles the heterogeneous sizing through CRUSH weights, and exposes two StorageClasses: <code>rook-ceph-block</code> for RWO block storage and <code>rook-cephfs</code> for RWX shared filesystem.</p>
+
+        <div class="war-story">
+          <div class="ws-label">Real constraint</div>
+          <p>Worker1 couldn't join the Ceph pool because its secondary disk, <code>sdb</code> at 50GB, was already claimed by MinIO as a local PV. Rook-Ceph only takes raw, unpartitioned block devices with no existing filesystem. MinIO stays on local-storage; everything else migrated to Ceph.</p>
+        </div>
+
+        <h3>Post-migration storage layout</h3>
+        <div class="metrics">
+          <div class="metric">
+            <div class="k">OSD nodes</div>
+            <div class="v">3</div>
+            <div class="delta">workers 2, 3, 4</div>
+          </div>
+          <div class="metric">
+            <div class="k">Total Ceph capacity</div>
+            <div class="v">234<span class="unit">GiB raw</span></div>
+            <div class="delta">13.7% used</div>
+          </div>
+          <div class="metric">
+            <div class="k">Workloads migrated</div>
+            <div class="v">6</div>
+            <div class="delta">off NFS onto Ceph</div>
+          </div>
+        </div>
+
+        <p>Kafka brokers, PostgreSQL, Schema Registry, and NiFi all moved to <code>rook-ceph-block</code>. Airflow logs moved to <code>rook-cephfs</code> for RWX access across scheduler and worker pods. The Released NFS PVs are now orphaned: visible in the PV list and scheduled for cleanup once the migration is confirmed stable.</p>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+          <div>
+            <div class="t">Known issue: mon.a disk pressure</div>
+            <p class="d">The Ceph cluster is currently reporting <code>HEALTH_WARN: mon a is low on available space</code>. Mon.a runs on worker2, whose OS disk is at 69% utilization from container overlay layers and platform workloads, not from Ceph data. The Ceph data pool itself is healthy at 13.7% used with 202GiB available. Resolution: move the mon to a dedicated volume or expand the worker2 OS disk.</p>
+          </div>
         </div>
 
         <h2 id="outcomes">Outcomes</h2>
@@ -254,11 +306,14 @@
           <li><strong>Cold restore from Git alone.</strong> A fresh OpenShift cluster plus one <code>oc apply</code> reproduces the entire platform in wave order. No tribal knowledge required.</li>
           <li><strong>Two-engineer on-call.</strong> Per-phase runbooks cover every component. Sync-wave bootstrap makes a cold restore predictable and sequenced.</li>
           <li><strong>Nine production incidents documented.</strong> Every failure captured with symptom, root cause, and fix, available in the phase runbooks in the repository.</li>
+          <li><strong>All stateful workloads on proper block storage.</strong> Kafka, PostgreSQL, Schema Registry, and NiFi migrated from NFS to Rook-Ceph RBD. Airflow logs run on CephFS for RWX access.</li>
+          <li><strong>Heterogeneous hardware made useful.</strong> Three workers with different disk sizes, 34GB, 50GB, and 150GB, pooled into a single Ceph cluster through CRUSH weighting.</li>
         </ul>
 
         <h2 id="retrospective">What I'd Do Differently</h2>
         <p>The policy layer should have been day one. I rolled Kyverno retroactively to enforce things like "no hardcoded <code>imagePullSecrets</code>" and "every namespace requires a NetworkPolicy." Three production-bound misconfigurations during early rollouts would have been caught at admission time if the guardrails were there from the start. Kyverno is cheap to run; the cost of retrofitting policies onto a running platform is not.</p>
         <p>The other miss was treating Vault as infrastructure rather than a service. Early on, a Raft leader election storm masked itself as a Kafka client issue for nearly an hour. We now alert on Vault leader transitions, seal status, and policy denial rate as first-class signals, the same way we alert on Kafka consumer lag or Trino query failures. If your platform boots through Vault, Vault needs to be in your top-five observability concerns from day one.</p>
+        <p>On the storage side, the mon.a disk pressure is a predictable consequence of co-locating a Ceph monitor with a heavily loaded worker node on a 50GB OS disk. The better call from the start would have been a dedicated mon node or at minimum a separate partition for <code>/var/lib/rook</code>. ODF's hardware requirements exist for exactly this reason: they prevent the failure modes you hit when you run Ceph on undersized infrastructure.</p>
 
         <a class="cs-next" href="monitoring-stack.html">
           <div>
@@ -279,6 +334,7 @@
           <li><a href="#engineering">War Stories</a></li>
           <li><a href="#implementation">Bootstrap</a></li>
           <li><a href="#timeline">Build Sequence</a></li>
+          <li><a href="#phase2">Phase 2 Storage</a></li>
           <li><a href="#outcomes">Outcomes</a></li>
           <li><a href="#retrospective">Retrospective</a></li>
         </ol>

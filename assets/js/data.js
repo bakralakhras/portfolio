@@ -13,12 +13,12 @@ export const portfolioData = {
       category: 'platform',
       eyebrow: 'Platform Engineering',
       name: 'Sovereign Data Platform',
-      statement: 'GitOps-managed OpenShift 4.18 lakehouse with 10 stateful services, zero static credentials, and a single bootstrap command.',
-      stack: ['OpenShift', 'ArgoCD', 'Kafka', 'Trino', 'MinIO', 'Vault', 'Prometheus', 'Thanos', 'Airflow', 'Spark'],
+      statement: 'GitOps-managed OpenShift 4.18 lakehouse with 10 stateful services, zero static credentials, Rook-Ceph storage, and a single bootstrap command.',
+      stack: ['OpenShift', 'ArgoCD', 'Rook-Ceph', 'Kafka', 'Trino', 'MinIO', 'Vault', 'Prometheus', 'Thanos', 'Airflow', 'Spark'],
       highlights: [
         'App-of-apps deployment model with deterministic sync-wave ordering',
         'Vault Secrets Operator materializing secrets from Vault KV v2 paths',
-        'Cold restore from Git alone on private on-premises infrastructure'
+        'Stateful workloads migrated from NFS to Rook-Ceph block and CephFS storage'
       ],
       status: 'Production',
       links: [
@@ -82,18 +82,18 @@ export const portfolioData = {
       eyebrow: 'Platform Engineering',
       name: 'Sovereign Data Platform',
       problem: 'How do you run streaming, batch, and analytical workloads on private infrastructure without managed cloud services or configuration drift?',
-      approach: 'Made ArgoCD app-of-apps the control plane, split every stateful service into its own Application, and used Vault Secrets Operator so Git only references Vault paths.',
+      approach: 'Made ArgoCD app-of-apps the control plane, split every stateful service into its own Application, used Vault Secrets Operator for credentials, and migrated stateful workloads from NFS to Rook-Ceph.',
       decisions: [
         'ArgoCD app-of-apps over Helm umbrella charts for independent release cadence',
         'Vault Secrets Operator over static Kubernetes Secrets for auditable rotation',
-        'OpenShift Thanos Querier over a standalone Prometheus stack for lower ops overhead'
+        'Rook-Ceph over OpenShift Data Foundation when hardware constraints blocked ODF'
       ],
-      stack: ['OpenShift', 'ArgoCD', 'Vault', 'Thanos'],
+      stack: ['OpenShift', 'ArgoCD', 'Vault', 'Rook-Ceph'],
       href: 'case-studies/sovereign-data-platform.html',
       arch: [
         ['Git Repo', { text: 'ArgoCD', accent: true }, 'App-of-Apps'],
         ['Kafka', 'Trino', 'Spark', 'MinIO', 'Airflow'],
-        [{ text: 'Vault', accent: true }, 'Dynamic Creds', { text: 'Thanos', accent: true }]
+        [{ text: 'Vault', accent: true }, 'Dynamic Creds', { text: 'Rook-Ceph', accent: true }]
       ]
     },
     {
