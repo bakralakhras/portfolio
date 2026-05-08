@@ -1,81 +1,97 @@
-# Bakr Alakhras Portfolio
+# Bakr Alakhras — Portfolio
 
-Personal portfolio for Bakr Alakhras, an Infrastructure & System Engineer focused on infrastructure automation, platform operations, observability, and data platform reliability.
+> Static portfolio for an Infrastructure & System Engineer focused on resilient systems, platform operations, observability, automation, and data infrastructure.
 
-The site is a static HTML/CSS/JavaScript portfolio. It highlights selected infrastructure and data platform projects, detailed case studies, technical experience, skills, education, and certifications.
+<p align="left">
+  <img alt="Static Site" src="https://img.shields.io/badge/static_site-0D1117?style=for-the-badge&logo=html5&logoColor=E34F26&labelColor=0D1117">
+  <img alt="Vanilla JS" src="https://img.shields.io/badge/vanilla_js-0D1117?style=for-the-badge&logo=javascript&logoColor=F7DF1E&labelColor=0D1117">
+  <img alt="CSS" src="https://img.shields.io/badge/custom_css-0D1117?style=for-the-badge&logo=css3&logoColor=1572B6&labelColor=0D1117">
+  <img alt="GitHub Pages Ready" src="https://img.shields.io/badge/github_pages-ready-0D1117?style=for-the-badge&logo=githubpages&logoColor=white&labelColor=0D1117">
+</p>
 
-## Overview
+## Purpose
 
-This portfolio is designed to be simple to run, easy to maintain, and deployable from any static hosting provider.
+This repository contains my personal engineering portfolio. It is built as a lightweight static site with no framework, no build pipeline, and no runtime dependencies.
 
-Key sections include:
+The site highlights:
 
-- Projects and engineering work
-- Technical case studies
-- Infrastructure, DevOps, observability, and data platform skills
-- Professional experience
-- Education and certifications
-- Contact links
+- Infrastructure and systems engineering work
+- Platform and data infrastructure projects
+- Observability and reliability case studies
+- Professional experience, skills, education, and certifications
+- Practical engineering decisions, tradeoffs, and implementation notes
+
+## Featured Case Studies
+
+| Case Study | Focus | Stack |
+|---|---|---|
+| Sovereign Data Platform | GitOps-managed OpenShift data platform with zero static credentials | OpenShift, ArgoCD, Vault, Kafka, Trino, MinIO |
+| Distributed NiFi Monitoring Stack | HA observability for 60 NiFi nodes across 20 sites | Prometheus, Thanos, Grafana, Keepalived, SeaweedFS |
+| HA PostgreSQL with Patroni | Self-managed PostgreSQL high availability on RHEL | PostgreSQL, Patroni, etcd, HAProxy, Keepalived |
+| Real-Time Fraud Detection Platform | Streaming and batch analytics on a lakehouse foundation | Kafka, Spark, Iceberg, Trino, Airflow |
+| AI Incident Responder | Automated alert triage and remediation workflow | FastAPI, Celery, Prometheus, LLM APIs |
 
 ## Tech Stack
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- JavaScript modules for structured portfolio content
-- Static hosting through GitHub Pages or any equivalent web server
+The portfolio itself is intentionally simple.
 
-No build step, package manager, or frontend framework is required.
+| Layer | Technology |
+|---|---|
+| Markup | HTML5 |
+| Styling | Custom CSS |
+| Interactivity | Vanilla JavaScript |
+| Content Model | JavaScript modules |
+| Hosting | GitHub Pages or any static web server |
 
-## Project Structure
+No React, no bundler, no package manager, no build command.
+
+## Repository Structure
 
 ```text
 .
-├── index.html
-├── Portfolio.html
-├── styles.css
-├── CONTENT.md
+├── index.html                  # Default GitHub Pages entry point
+├── Portfolio.html              # Main portfolio page
+├── styles.css                  # Shared styles for case studies
+├── CONTENT.md                  # Notes for editing portfolio content
 ├── assets/
 │   ├── css/
-│   │   └── main.css
+│   │   └── main.css            # Homepage styles
 │   └── js/
-│       ├── app.js
-│       ├── data.js
-│       ├── icons.js
-│       └── renderers.js
+│       ├── app.js              # Homepage behavior
+│       ├── data.js             # Main content source
+│       ├── icons.js            # Inline icon helpers
+│       └── renderers.js        # Card/timeline/section renderers
 └── case-studies/
-    ├── ai-incident-responder.html
-    ├── fraud-detection.html
+    ├── sovereign-data-platform.html
     ├── monitoring-stack.html
     ├── postgres-ha.html
-    └── sovereign-data-platform.html
+    ├── fraud-detection.html
+    └── ai-incident-responder.html
 ```
 
-## Running Locally
+## Local Preview
 
-Because the homepage loads content through JavaScript modules, serve the site through a local HTTP server instead of opening the HTML file directly.
-
-From the project root:
+The homepage uses JavaScript modules, so serve it through HTTP instead of opening the file directly.
 
 ```powershell
 python -m http.server 8000
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:8000/
 ```
 
-## Editing Content
+## Updating Content
 
-Most repeatable homepage content is managed in:
+Homepage content is centralized in:
 
 ```text
 assets/js/data.js
 ```
 
-Use that file to update:
+Use it to edit:
 
 - Project cards
 - Case study previews
@@ -84,46 +100,52 @@ Use that file to update:
 - Education
 - Certifications
 
-Detailed case study pages live in:
+Standalone case studies live in:
 
 ```text
 case-studies/
 ```
 
-For content editing notes, see:
+Additional editing notes are in:
 
 ```text
 CONTENT.md
 ```
 
-## Case Studies
+## Design Direction
 
-Current case studies include:
+The visual direction is dark, technical, and systems-oriented:
 
-- Sovereign Data Platform
-- Distributed NiFi Monitoring Stack
-- Real-Time Fraud Detection Platform
-- AI Incident Responder
-- HA PostgreSQL with Patroni
+- Terminal-inspired typography
+- Low-noise layouts
+- Dense but readable project cards
+- Architecture diagrams rendered directly in HTML/CSS
+- Case studies written around decisions, tradeoffs, incidents, and outcomes
 
-Each case study is written as a standalone HTML page using the shared visual system from `styles.css`.
+The goal is not to look like a marketing page. The goal is to present engineering work clearly and credibly.
 
 ## Deployment
 
-This repository is suitable for GitHub Pages.
+This repository is ready for GitHub Pages.
 
-The default entry point is:
+Default entry point:
 
 ```text
 index.html
 ```
 
-`Portfolio.html` is kept as the named homepage file for compatibility with the original local project workflow.
+The named homepage file is also kept as:
+
+```text
+Portfolio.html
+```
 
 ## Author
 
-Bakr Alakhras  
+**Bakr Alakhras**  
 Infrastructure & System Engineer
 
-- GitHub: [bakralakhras](https://github.com/bakralakhras)
-- LinkedIn: [bakr-alakhras](https://www.linkedin.com/in/bakr-alakhras/)
+| Link | URL |
+|---|---|
+| GitHub | [github.com/bakralakhras](https://github.com/bakralakhras) |
+| LinkedIn | [linkedin.com/in/bakr-alakhras](https://www.linkedin.com/in/bakr-alakhras/) |
